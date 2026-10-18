@@ -96,6 +96,28 @@ svg text{fill:var(--muted);font-size:11px;font-family:var(--body)}
 details summary{cursor:pointer;font-weight:600}
 textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px}
 .flag{color:var(--warn);font-size:.78rem;font-weight:600}
+.wrow{display:grid;grid-template-columns:110px 1fr 80px;gap:8px;align-items:center;font-size:.85rem}
+.wrow b{text-align:right;font-variant-numeric:tabular-nums}
+.wbar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.wbar i{display:block;height:100%}
+.strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dayb{display:grid;gap:1px;justify-items:center;padding:6px 2px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;position:relative;min-width:0}
+.dayb span{font-size:.7rem;color:var(--muted);font-weight:600}.dayb b{font-family:var(--display);font-size:1.15rem}
+.dayb em{font-style:normal;font-size:.62rem;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dayb.today{border-color:var(--ink)}.dayb.sel{outline:2px solid var(--accent);outline-offset:1px}
+.dayb.done{background:var(--accent-soft)}.dayb.part{background:var(--tee-soft)}.dayb i{position:absolute;top:2px;right:4px;font-style:normal;color:var(--accent);font-weight:700;font-size:.8rem}
+.ucard{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:10px}.ucard.done{background:var(--accent-soft)}
+.clist{margin:0;padding:0;list-style:none;display:grid;gap:8px}.clist li{border-top:1px solid var(--line);padding-top:8px;display:grid;gap:6px}
+.cl-top{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;color:var(--ink);font-weight:400}.cl-top input{width:24px;height:24px;flex:none;margin-top:2px}
+.cl-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;align-items:end;font-size:.82rem;padding-left:34px}
+.cl-grid input{padding:6px 8px}
+.xtra summary{font-size:.85rem;color:var(--muted)}
+.chipu{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.chipu.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.goalbar{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.goalbar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;padding:1px 6px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.tag.training{border-color:var(--c-eagle);color:var(--c-eagle)}
+.seg button{white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -116,7 +138,39 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;c
     </div>
   </header>
 
+  <section id="secGoal" style="gap:8px">
+    <div class="row between"><h2 id="goalTitle">Ziel</h2><button class="ghost small" id="goalEdit">Ziel ändern</button></div>
+    <div class="goalbar"><i id="goalFill"></i></div>
+    <div class="row between note"><span id="goalFrom"></span><span id="goalInfo"></span><span id="goalTo"></span></div>
+    <div class="form" id="goalForm" hidden>
+      <label>Ziel-HCPI<input id="goalH" inputmode="decimal" autocomplete="off"></label>
+      <label>Bis<input id="goalD" type="date"></label>
+      <label>Startwert<input id="goalS" inputmode="decimal" autocomplete="off"></label>
+      <div class="row" style="align-self:end"><button class="small" id="goalSave">Speichern</button></div>
+    </div>
+  </section>
+
   <div class="tiles" id="vorg"></div>
+
+  <section id="secTrain">
+    <div class="row between"><h2>Training</h2><div class="row"><button class="ghost small" id="tPrev" aria-label="Vorwoche">‹</button><button class="ghost small" id="tToday">Heute</button><button class="ghost small" id="tNext" aria-label="Nächste Woche">›</button></div></div>
+    <p class="note" id="tWeekHead"></p>
+    <div class="strip" id="tStrip"></div>
+    <div id="tWeek" style="display:grid;gap:6px"></div>
+    <h3>Soll-Ist-Kurve seit Mo 19.10.</h3>
+    <p class="note">Aufsummierte Minuten: gestrichelt = Soll laut Plan, durchgezogen = Ist (nach Ist-Tag).</p>
+    <div id="tCurve" style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"></div>
+    <h3 id="tDayHead"></h3>
+    <div id="tDay" style="display:grid;gap:12px"></div>
+    <span class="note" id="tMsg"></span>
+    <h3>Letzte Einheiten</h3>
+    <div class="tbl"><table id="tHist"></table></div>
+    <h3>Monatlicher Leistungstest</h3>
+    <p class="note">Am ersten Trainingstag des Monats statt der Performance-Blöcke. Grün = Ziel Juni 2027 erreicht. Arccos-Werte als Strokes Gained eintragen (z. B. −1,5).</p>
+    <div class="form"><label>Monat<input id="tMonth" type="month"></label></div>
+    <div class="tbl"><table id="tTests"></table></div>
+    <div class="row"><button class="small" id="tTestSave">Leistungstest speichern</button><span class="note" id="tTestMsg"></span></div>
+  </section>
 
   <section id="secEntry">
     <div class="row between">
@@ -125,6 +179,10 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;c
         <button id="mHoles" aria-pressed="true">Loch für Loch</button><button id="mTotal" aria-pressed="false">Nur Gesamtscore</button>
       </div>
     </div>
+    <div class="seg" role="group" aria-label="Rundentyp" id="typeSeg">
+      <button data-type="turnier" aria-pressed="true">Turnier</button><button data-type="privat" aria-pressed="false">Privat (vorgabewirksam)</button><button data-type="training" aria-pressed="false">Training</button>
+    </div>
+    <p class="note" id="typeNote">Zählt für dein Stammblatt und den HCPI.</p>
     <div class="form">
       <label>Platz / Abschlag<select id="course"></select></label>
       <label>Datum<input id="date" type="date"></label>
@@ -142,7 +200,18 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;c
   </section>
 
   <section id="secDev">
-    <h2>Entwicklung</h2>
+    <div class="row between">
+      <h2>Entwicklung</h2>
+      <div class="seg" role="group" aria-label="Filter" id="filtSeg">
+        <button data-f="all" aria-pressed="true">Alle</button><button data-f="turnier" aria-pressed="false">Turnier</button><button data-f="privat" aria-pressed="false">Privat</button><button data-f="training" aria-pressed="false">Training</button>
+      </div>
+    </div>
+    <div class="kpis" id="formKpis"></div>
+    <h3>Form-Verlauf</h3>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Wertungsrunden (Ø letzte 5)</span><span><i style="background:var(--c-eagle)"></i>Training (Ø letzte 5)</span><span><i style="background:var(--tee)"></i>Ziel-Differential</span></div>
+    <div class="chartbox" id="formChart"></div>
+    <p class="note">Gleitender Schnitt der Score Differentials, rechts = neueste Runde. Liegt eine Linie unter der Ziellinie, spielst du auf Zielniveau.</p>
+    <h3>Ergebnisse je Loch</h3>
     <div class="kpis" id="kpis"></div>
     <div class="legend" id="legend"></div>
     <div class="chartbox" id="distChart"></div>
@@ -208,7 +277,7 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;c
     <details>
       <summary>Sichern und wiederherstellen</summary>
       <div style="display:grid;gap:10px;margin-top:10px">
-        <p class="note" id="storeNote">Alle Daten liegen nur auf diesem Gerät. Öffne die App immer über das Symbol auf dem Home-Bildschirm und lade dir regelmäßig eine Sicherung herunter, z. B. nach jedem Turnier. Die Sicherung enthält Stammblatt, Runden und eigene Plätze.</p>
+        <p class="note" id="storeNote">Alle Daten liegen nur auf diesem Gerät. Öffne die App immer über das Symbol auf dem Home-Bildschirm und lade dir regelmäßig eine Sicherung herunter, z. B. nach jedem Turnier. Die Sicherung enthält Stammblatt, Runden, eigene Plätze, Trainingseinheiten und Leistungstests.</p>
         <textarea id="backup" aria-label="Sicherungsdaten"></textarea>
         <div class="row">
           <button class="ghost small" id="dl">Sicherung herunterladen</button>
@@ -251,17 +320,17 @@ const PRESETS={
   motzA9G:{club:MZ,name:"A 1–9",tee:"Gelb",holes:9,cr:36.3,s:139,par:MA,si:[9,8,6,1,7,4,5,3,2]}
 };
 const SEED={"rec":[{"d":"17.10.26","l":"Faldo Weiß · 73","sd":-1.7,"adj":-2,"esr":-2},{"d":"16.10.26","l":"After Work 9 L · 37","sd":6.7,"adj":-2},{"d":"19.09.26","l":"End of Summer · 87","sd":13.7,"adj":-2},{"d":"12.09.26","l":"Jugendcup 9 L · 37","sd":7.5,"adj":-2},{"d":"30.08.26","l":"Clubmeisterschaft · 88","sd":13.7,"adj":-2},{"d":"29.08.26","l":"Clubmeisterschaft · 81","sd":8.3,"adj":-2},{"d":"20.08.26","l":"GVBB Gatow · 88","sd":15,"adj":-2},{"d":"19.08.26","l":"GVBB Gatow · 84","sd":11.4,"adj":-2},{"d":"18.08.26","l":"GVBB Gatow · 81","sd":8.7,"adj":-2},{"d":"05.08.26","l":"Offener Mittwoch · 92","sd":17.3,"adj":-2},{"d":"21.06.26","l":"Monatspreis S · 82","sd":9.2,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9.2,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9.4,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":11,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":12.5,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":14,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":15.5,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":16,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":17,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":18,"adj":0}],"hist":[{"l":"Start","h":8.5},{"l":"17.10.26","h":5.1}],"low":5.1,"undo":[]};
-const CFG={"id": "simon", "who": "Simon Steiner · Berliner GC Stolper Heide", "fav": ["westW", "westS", "ost18", "faldoW"], "scen": ["westW", "westS", "ost18", "faldoW"], "goal": null, "typical": 12.0, "typicalText": "Spielt Simon auf seinem bisherigen Niveau (Ø SD ≈ 12, rund 85 vom Weiß West),", "recNote": "Ausgangswerte aus dem Scoring Record (Seite 1 exakt, Seite 2 geschätzt). Die Faldo-Runde (73 vom Weiß) ist mit dem geschätzten Rating 75,2/150 eingerechnet; bitte mit golf.de abgleichen.", "def": "westW"};
+const CFG={"id": "simon", "who": "Simon Steiner · Berliner GC Stolper Heide", "fav": ["westW", "westS", "ost18", "faldoW"], "scen": ["westW", "westS", "ost18", "faldoW"], "goal": 1, "goalH": 1, "goalDate": "2027-06-30", "goalStart": 5.1, "typical": 12.0, "typicalText": "Spielt Simon auf seinem bisherigen Niveau (Ø SD ≈ 12, rund 85 vom Weiß West),", "recNote": "Ausgangswerte aus dem Scoring Record (Seite 1 exakt, Seite 2 geschätzt). Die Faldo-Runde (73 vom Weiß) ist mit dem geschätzten Rating 75,2/150 eingerechnet; bitte mit golf.de abgleichen.", "def": "westW"};
 const $=id=>document.getElementById(id);
 const r1=x=>Math.round(x*10)/10;
 const fmt=x=>(x<0?"−":"")+Math.abs(x).toFixed(1).replace(".",",");
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LKEY="hcpi-tracker-"+CFG.id+"-v3";
-let S=null, ROUNDS=[], CUSTOM={}, db=null, stateRef=null, mode="holes", editId=null;
+let S=null, ROUNDS=[], CUSTOM={}, TRAIN=[], TESTS={}, db=null, stateRef=null, mode="holes", editId=null, rtype="turnier", filt="all";
 let q=Promise.resolve();
 const enqueue=fn=>{q=q.then(fn).catch(e=>showStatus(e&&e.code==="quota_exceeded"?"Speicher voll. Bitte Sicherung kopieren.":"Speichern hat nicht geklappt. Lade die Seite neu und prüf den letzten Eintrag."));return q};
 function showStatus(t){$("status").hidden=!t;$("status").textContent=t||""}
-function cacheLocal(){try{localStorage.setItem(LKEY,JSON.stringify({S,ROUNDS,CUSTOM}))}catch(e){}}
+function cacheLocal(){try{localStorage.setItem(LKEY,JSON.stringify({S,ROUNDS,CUSTOM,TRAIN,TESTS}))}catch(e){}}
 
 /* ---------- Plätze ---------- */
 function courses(){return {...PRESETS,...CUSTOM}}
@@ -299,11 +368,18 @@ function evalRound(c,gross,ph){const n=c.holes;const holes=[];const t={gross:0,a
   return {holes,t,dist,byPar,complete:t.played===n}}
 
 /* ---------- Speichern ---------- */
-function writeState(){cacheLocal();if(!stateRef)return;const snap=JSON.parse(JSON.stringify({rec:S.rec,hist:S.hist,low:S.low,undo:(S.undo||[]).slice(-5)}));enqueue(()=>stateRef.set(snap))}
+function writeState(){cacheLocal();if(!stateRef)return;const snap=JSON.parse(JSON.stringify({rec:S.rec,hist:S.hist,low:S.low,goal:S.goal||null,undo:(S.undo||[]).slice(-5)}));enqueue(()=>stateRef.set(snap))}
 function writeRound(r){cacheLocal();if(!db)return;enqueue(()=>db.collection("rounds").doc(r.id).set(r))}
 function dropRound(id){cacheLocal();if(!db||!id)return;enqueue(()=>db.collection("rounds").doc(id).delete())}
 function writeCourse(id,c){cacheLocal();if(!db)return;enqueue(()=>db.collection("courses").doc(id).set(c))}
 function dropCourse(id){cacheLocal();if(!db)return;enqueue(()=>db.collection("courses").doc(id).delete())}
+
+/* ---------- Ziel ---------- */
+function goal(){const g=(S&&S.goal)||{};return {h:g.h??CFG.goalH,date:g.date||CFG.goalDate,start:g.start??CFG.goalStart}}
+function goalSd(){return solve(10,goal().h)}
+function goalScore(c,h){const X=goalSd();return c.holes===9?c.cr+(X-(0.52*h+1.2))*c.s/113:c.cr+X*c.s/113}
+const isOfficial=t=>t!=="training";
+const typeOf=r=>r.type||"turnier";
 
 /* ---------- Erfassen ---------- */
 function curCourse(){return courses()[$("course").value]}
@@ -339,27 +415,60 @@ function updateLive(){if(!S||!S.rec.length)return;const c=curCourse();if(!c)retu
       <div><span>Löcher</span><b>${t.played}/${c.holes}</b></div>`:"";
     if(ev.complete)adjTotal=t.adj;else info=`Noch ${c.holes-t.played} Loch offen. Vorgabe ${ph}.`;
   }else{const sc=+$("score").value;if(sc>0)adjTotal=sc;else info=`Gesamtscore eintragen. Vorgabe ${ph}.`;$("summary").innerHTML=""}
-  if(adjTotal!=null){const sd=sdFor(c,adjTotal,h);const t=addTo(S,{sd});const diff=r1(t.h-h);
-    $("preview").innerHTML=`<span>Score Differential <b>${fmt(sd)}</b></span><span>Neuer HCPI <b>${fmt(t.h)}</b></span>
-      <span style="color:${diff>0?"var(--warn)":"var(--accent)"};font-weight:700">${diff>0?"+":diff<0?"":"±"}${fmt(diff)}</span>${t.esr?`<span class="pill esr">ESR ${fmt(t.esr)}</span>`:""}`;$("add").disabled=false}
+  if(adjTotal!=null){const sd=sdFor(c,adjTotal,h);const gs=goalScore(c,h),gd=r1(adjTotal-gs),gsd=r1(sd-goalSd());
+    const gTxt=`<span>Ziel-Score hier <b>${fmt(gs)}</b></span><span style="color:${gd>0?"var(--warn)":"var(--accent)"};font-weight:700">${gd>0?"+"+fmt(gd)+" über Ziel":gd<0?fmt(-gd)+" unter Ziel":"genau im Ziel"}</span>`;
+    if(isOfficial(rtype)){const t=addTo(S,{sd});const diff=r1(t.h-h);
+      $("preview").innerHTML=`<span>Score Differential <b>${fmt(sd)}</b></span><span>Neuer HCPI <b>${fmt(t.h)}</b></span>
+      <span style="color:${diff>0?"var(--warn)":"var(--accent)"};font-weight:700">${diff>0?"+":diff<0?"":"±"}${fmt(diff)}</span>${t.esr?`<span class="pill esr">ESR ${fmt(t.esr)}</span>`:""}${gTxt}`}
+    else $("preview").innerHTML=`<span>Score Differential <b>${fmt(sd)}</b></span><span class="tag training">Training, zählt nicht für den HCPI</span>${gTxt}<span>Δ Differential zum Ziel <b>${gsd>0?"+":""}${fmt(gsd)}</b></span>`;
+    $("add").disabled=false}
   else{$("preview").textContent=info;$("add").disabled=true}}
 function saveRound(){const c=curCourse(),id0=$("course").value;const h=hcpiOf(S.rec,S.low),ph=courseHcp(c,h);
   let adjTotal,ev=null;if(mode==="holes"){ev=evalRound(c,readGross(),ph);if(!ev.complete)return;adjTotal=ev.t.adj}else{adjTotal=+$("score").value;if(!(adjTotal>0))return}
   const sd=sdFor(c,adjTotal,h);const dIso=$("date").value||new Date().toISOString().slice(0,10);const d=dIso.split("-").reverse().join(".").replace(/\.20(\d\d)$/,".$1");
-  const rid="r"+Date.now().toString(36);const prev={rec:S.rec,hist:S.hist,low:S.low,rid};
-  const t=addTo(S,{d,l:`${c.name} ${c.tee} · ${ev?ev.t.gross+(ev.t.pick?"*":""):adjTotal}`,sd,rid});
-  S.undo=[...(S.undo||[]).slice(-4),prev];S.rec=t.rec;S.low=t.low;S.hist=[...S.hist,{l:d,h:t.h}];
-  const r={id:rid,date:dIso,courseId:id0,course:cLabel(c),club:c.club,holes:c.holes,par:c.par,si:c.si,ph,hcpi:h,sd,esr:t.esr,hcpiAfter:t.h,adj:adjTotal,mode};
+  const rid="r"+Date.now().toString(36);const prev={rec:S.rec,hist:S.hist,low:S.low,rid};const gs=r1(goalScore(c,h)),gsd=r1(goalSd());
+  let t={h,esr:0};
+  if(isOfficial(rtype)){t=addTo(S,{d,l:`${c.name} ${c.tee} · ${ev?ev.t.gross+(ev.t.pick?"*":""):adjTotal}`,sd,rid,type:rtype});S.rec=t.rec;S.low=t.low;S.hist=[...S.hist,{l:d,h:t.h}]}
+  S.undo=[...(S.undo||[]).slice(-4),prev];
+  const r={id:rid,date:dIso,type:rtype,courseId:id0,course:cLabel(c),club:c.club,holes:c.holes,par:c.par,si:c.si,ph,hcpi:h,sd,esr:t.esr,hcpiAfter:t.h,adj:adjTotal,mode,goalScore:gs,goalSd:gsd};
   if(ev){r.gross=readGross();r.t=ev.t;r.dist=ev.dist;r.byPar=ev.byPar}
   ROUNDS=[...ROUNDS.filter(x=>x.id!==rid),r];writeRound(r);writeState();
-  c.par.forEach((p,i)=>{if($("g"+i))$("g"+i).value=""});$("score").value="";$("addMsg").textContent="Gespeichert: SD "+fmt(sd)+", HCPI "+fmt(t.h);render()}
+  c.par.forEach((p,i)=>{if($("g"+i))$("g"+i).value=""});$("score").value="";$("addMsg").textContent=(isOfficial(rtype)?"Gespeichert: SD "+fmt(sd)+", HCPI "+fmt(t.h):"Training gespeichert: SD "+fmt(sd))+", "+(adjTotal-gs>0?"+"+fmt(r1(adjTotal-gs))+" über":fmt(r1(gs-adjTotal))+" unter")+" Ziel-Score";render()}
 function undoLast(){if(!S.undo||!S.undo.length)return;const p=S.undo.pop();S.rec=p.rec;S.hist=p.hist;S.low=p.low;
   if(p.rid){ROUNDS=ROUNDS.filter(r=>r.id!==p.rid);dropRound(p.rid)}writeState();$("addMsg").textContent="Letzte Runde entfernt";render()}
 
 /* ---------- Entwicklung ---------- */
-function renderDev(){const rs=ROUNDS.filter(r=>r.dist).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.id<b.id?-1:1);
+function rollAvg(v,k){return v.map((_,i)=>{const w=v.slice(Math.max(0,i-k+1),i+1);return w.reduce((a,b)=>a+b,0)/w.length})}
+function idxOf(v){const n=v.length;if(!n)return null;const s=[...v].sort((a,b)=>a-b);const cnt=n>=20?8:n>=19?7:n>=17?6:n>=15?5:n>=12?4:n>=9?3:n>=7?2:1;return s.slice(0,cnt).reduce((a,b)=>a+b,0)/cnt}
+function renderDev(){renderTrain();
+  const byDate=(a,b)=>a.date<b.date?-1:a.date>b.date?1:a.id<b.id?-1:1;
+  const all=ROUNDS.slice().sort(byDate);
+  const train=all.filter(r=>typeOf(r)==="training").map(r=>r.sd);
+  const off=S&&S.rec?S.rec.slice(0,20).map(o=>o.sd).reverse():[];
+  const gsd=S&&S.rec&&S.rec.length?goalSd():null;
+  // Kennzahlen Form
+  const avg=v=>v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+  const offL5=avg(off.slice(-5)),trL5=avg(train.slice(-5)),trIdx=train.length>=3?r1(idxOf(train.slice(-20))):null;
+  const gap=offL5!=null&&trL5!=null&&train.length>=3?r1(offL5-trL5):null;
+  $("formKpis").innerHTML=[
+    ["Ø Differential Wertung (letzte 5)",offL5!=null?fmt(r1(offL5)):"–",gsd!=null&&offL5!=null?`Ziel ${fmt(gsd)} · ${offL5-gsd>0?"+":""}${fmt(r1(offL5-gsd))}`:""],
+    ["Ø Differential Training (letzte 5)",trL5!=null?fmt(r1(trL5)):"–",train.length?`${train.length} Trainingsrunde${train.length>1?"n":""}`:"noch keine Trainingsrunde"],
+    ["Trainings-HCPI",trIdx!=null?fmt(trIdx):"–",trIdx!=null?"wenn Training zählen würde":"ab 3 Trainingsrunden"],
+    ["Turnier-Lücke",gap!=null?(gap>0?"+":"")+fmt(gap):"–",gap!=null?(gap>0?"im Turnier schlechter als im Training":"im Turnier besser als im Training"):"ab 3 Trainingsrunden"]
+  ].map(([l,v,e])=>`<div><span>${l}</span><b>${v}</b><em>${e}</em></div>`).join("");
+  // Form-Chart
+  const A=rollAvg(off,5),T=rollAvg(train.slice(-20),5),n=Math.max(A.length,T.length,2);
+  const W=Math.max(320,40+n*26),H=180,pl=34,pr=12,vals=[...A,...T,...(gsd!=null?[gsd]:[])];
+  if(vals.length){const lo=Math.floor(Math.min(...vals)-1),hi=Math.ceil(Math.max(...vals)+1),y=v=>12+(hi-v)*(H-36)/(hi-lo),x=(i,len)=>W-pr-(len-1-i)*(W-pl-pr)/(n-1);
+    let g="",st=Math.max(1,Math.ceil((hi-lo)/5));for(let v=Math.ceil(lo/st)*st;v<=hi;v+=st)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl-5}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+    if(gsd!=null)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(gsd)}" y2="${y(gsd)}" stroke="var(--tee)" stroke-width="2" stroke-dasharray="5 4"/><text x="${pl+4}" y="${y(gsd)-5}" style="fill:var(--ink);font-weight:700">Ziel ${fmt(gsd)}</text>`;
+    const line=(arr,col)=>arr.length?`<path d="${arr.map((v,i)=>`${i?"L":"M"}${x(i,arr.length)},${y(v)}`).join("")}" fill="none" stroke="${col}" stroke-width="2.5"/>`+arr.map((v,i)=>`<circle cx="${x(i,arr.length)}" cy="${y(v)}" r="${i===arr.length-1?4.5:2.5}" fill="${col}"/>`).join(""):"";
+    g+=line(A,"var(--accent)")+line(T,"var(--c-eagle)");g+=`<text x="${W-pr}" y="${H-6}" text-anchor="end">heute</text><text x="${pl}" y="${H-6}">ältere Runden</text>`;
+    $("formChart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Form-Verlauf">${g}</svg>`}else $("formChart").innerHTML="";
+  // Lochstatistik mit Filter
+  const rs=all.filter(r=>r.dist&&(filt==="all"||typeOf(r)===filt));
   $("legend").innerHTML=CLS.map(([k,l])=>`<span><i class="k-${k}"></i>${l}</span>`).join("");
-  if(!rs.length){$("kpis").innerHTML='<p class="note">Sobald du eine Runde Loch für Loch erfasst, siehst du hier Birdies, Pars, Bogeys und Doppelbogeys je Runde und wie sie sich entwickeln.</p>';$("distChart").innerHTML="";$("roundsTbl").innerHTML="";return}
+  if(!rs.length){$("kpis").innerHTML=`<p class="note">${filt==="all"?"Sobald du eine Runde Loch für Loch erfasst, siehst du hier Birdies, Pars, Bogeys und Doppelbogeys je Runde.":"Noch keine Loch-für-Loch-Runde in dieser Kategorie."}</p>`;$("distChart").innerHTML="";$("roundsTbl").innerHTML="";return}
   const per18=(arr,f)=>{let s=0,h=0;arr.forEach(r=>{s+=f(r);h+=r.holes});return h?s*18/h:0};
   const parAvg=(arr,p)=>{let o=0,n=0;arr.forEach(r=>{const b=r.byPar&&r.byPar[p];if(b){o+=b.over;n+=b.n}});return n?o/n:null};
   const last=rs.slice(-5);
@@ -369,16 +478,17 @@ function renderDev(){const rs=ROUNDS.filter(r=>r.dist).sort((a,b)=>a.date<b.date
   html+=[3,4,5].map(p=>{const a=parAvg(rs,p),b=parAvg(last,p);if(a==null)return "";const d=b-a,cl=rs.length<6||Math.abs(d)<0.02?"":(d<0?"up":"down");
     return `<div><span>Ø über Par auf Par ${p}</span><b>+${b.toFixed(2).replace(".",",")}</b><em>letzte 5 · gesamt +${a.toFixed(2).replace(".",",")} <span class="${cl}">${rs.length<6?"":(d<0?"▲":d>0?"▼":"")}</span></em></div>`}).join("");
   $("kpis").innerHTML=html;
-  // gestapelte Balken je Runde (Anteile)
-  const R=rs.slice(-15),bw=30,gap=12,H=150,pl=30,W=Math.max(300,pl+R.length*(bw+gap)+10),ys=v=>10+(1-v)*(H-30);
-  let g="";[0,.5,1].forEach(v=>{g+=`<line x1="${pl}" x2="${W}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${pl-5}" y="${ys(v)+4}" text-anchor="end">${v*100}%</text>`});
-  R.forEach((r,i)=>{let acc=0;const x=pl+6+i*(bw+gap);CLS.forEach(([k])=>{const f=r.dist[k]/r.holes;if(!f)return;
-    g+=`<rect x="${x}" y="${ys(acc+f)}" width="${bw}" height="${ys(acc)-ys(acc+f)}" fill="var(--c-${k==="pick"?"triple":k})" ${k==="pick"?'opacity=".5"':""}/>`;acc+=f});
-    g+=`<text x="${x+bw/2}" y="${H-4}" text-anchor="middle">${r.date.slice(8,10)}.${r.date.slice(5,7)}.</text>`});
-  $("distChart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Ergebnisverteilung je Runde">${g}</svg>`;
-  $("roundsTbl").innerHTML=`<tr><th>Datum</th><th>Platz</th><th>Brutto</th><th>Netto</th><th>Pkt</th><th>E+</th><th>Bi</th><th>Par</th><th>Bo</th><th>DB</th><th>TB+</th><th>SD</th></tr>`+
-    rs.slice().reverse().map(r=>`<tr><td>${r.date.slice(8,10)}.${r.date.slice(5,7)}.${r.date.slice(2,4)}</td><td>${esc(r.course)}</td><td>${r.t.gross}${r.t.pick?"*":""}</td><td>${r.t.gross-r.ph}</td><td>${r.t.pts}</td>
-      <td>${r.dist.eagle||""}</td><td>${r.dist.birdie||""}</td><td>${r.dist.par||""}</td><td>${r.dist.bogey||""}</td><td>${r.dist.double||""}</td><td>${(r.dist.triple+r.dist.pick)||""}</td><td>${fmt(r.sd)}</td></tr>`).join("")}
+  const R=rs.slice(-15),bw=30,gap2=12,H2=150,pl2=30,W2=Math.max(300,pl2+R.length*(bw+gap2)+10),ys=v=>10+(1-v)*(H2-30);
+  let g2="";[0,.5,1].forEach(v=>{g2+=`<line x1="${pl2}" x2="${W2}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${pl2-5}" y="${ys(v)+4}" text-anchor="end">${v*100}%</text>`});
+  R.forEach((r,i)=>{let acc=0;const xx=pl2+6+i*(bw+gap2);CLS.forEach(([k])=>{const fr=r.dist[k]/r.holes;if(!fr)return;
+    g2+=`<rect x="${xx}" y="${ys(acc+fr)}" width="${bw}" height="${ys(acc)-ys(acc+fr)}" fill="var(--c-${k==="pick"?"triple":k})" ${k==="pick"?'opacity=".5"':""}/>`;acc+=fr});
+    g2+=`<text x="${xx+bw/2}" y="${H2-4}" text-anchor="middle">${r.date.slice(8,10)}.${r.date.slice(5,7)}.</text>`});
+  $("distChart").innerHTML=`<svg viewBox="0 0 ${W2} ${H2}" width="${W2}" height="${H2}" role="img" aria-label="Ergebnisverteilung je Runde">${g2}</svg>`;
+  const TL={turnier:"Turnier",privat:"Privat",training:"Training"};
+  $("roundsTbl").innerHTML=`<tr><th>Datum</th><th>Typ</th><th>Platz</th><th>Brutto</th><th>Netto</th><th>Pkt</th><th>Δ Ziel</th><th>E+</th><th>Bi</th><th>Par</th><th>Bo</th><th>DB</th><th>TB+</th><th>SD</th></tr>`+
+    rs.slice().reverse().map(r=>{const dz=r.goalScore!=null?r1(r.adj-r.goalScore):null;return `<tr><td>${r.date.slice(8,10)}.${r.date.slice(5,7)}.${r.date.slice(2,4)}</td><td><span class="tag ${typeOf(r)==="training"?"training":""}">${TL[typeOf(r)]}</span></td><td>${esc(r.course)}</td><td>${r.t.gross}${r.t.pick?"*":""}</td><td>${r.t.gross-r.ph}</td><td>${r.t.pts}</td>
+      <td style="color:${dz==null?"":dz>0?"var(--warn)":"var(--accent)"}">${dz==null?"–":(dz>0?"+":"")+fmt(dz)}</td>
+      <td>${r.dist.eagle||""}</td><td>${r.dist.birdie||""}</td><td>${r.dist.par||""}</td><td>${r.dist.bogey||""}</td><td>${r.dist.double||""}</td><td>${(r.dist.triple+r.dist.pick)||""}</td><td>${fmt(r.sd)}</td></tr>`}).join("")}
 
 /* ---------- Plätze verwalten ---------- */
 function renderCourses(){const cs=courses(),hh=S&&S.rec&&S.rec.length?hcpiOf(S.rec,S.low):null;
@@ -404,6 +514,183 @@ function saveCourse(){const n=+$("cfHoles").value;const par=[],si=[];
   const id=editId||("c"+Date.now().toString(36));CUSTOM={...CUSTOM,[id]:c};writeCourse(id,c);
   $("courseForm").hidden=true;fillCourseSelect();$("course").value=id;buildHoleGrid();render()}
 
+/* ---------- Training ---------- */
+const MOB="Mobilisierung, Einschlagen";
+const B=(n,a,m,d,s,sz)=>({n,a,m,d,s,sz});
+const chk=l=>({t:"chk",l}),cnt=(g,o,l)=>({t:"cnt",g,o,l}),mx=(g,l)=>({t:"max",g,l});
+const PLANS={
+ harald:{days:{1:["G1"],2:["A"],3:["C1"],4:["G2"],5:["B"],6:["C2"],7:["G3"]},units:{
+  A:{n:"Golf A · Abschlag & Hölzer",b:[
+   B(MOB,"lang",10,"Oberkörperrotation, World’s Greatest Stretch, 10 Bälle Wedge bis Eisen 7",chk("aufgewärmt")),
+   B("Technik Hölzer","lang",30,"Tempo-Schwünge, Impact Drill, Rotieren nicht Kippen",cnt(7,10,"sauberer Treffpunkt")),
+   B("Performance","lang",35,"Zielkorridor-Challenge (30 m), Fairway hitter; kein Ball > 20 m rechts",cnt(8,14,"Drives im Korridor")),
+   B("Simulation","lang",25,"Drive unter Druck: Westplatz 1, 2, 3, 5, 7, 9 mit zweitem Schlag",cnt(4,6,"Fairways")),
+   B("Putten 2–3 m","putt",20,"Münzen Drill, Tiger Drill, 3-Ball Druck",cnt(12,20,"Putts aus 2,5 m"))]},
+  B:{n:"Golf B · Eisen, Par 3, kurzes Spiel",b:[
+   B(MOB,"lang",10,"wie Golf A",chk("aufgewärmt")),
+   B("Technik Eisen","lang",25,"Schlagflächenstellung mit Tee, Club Path Kontrolle (5er/6er, Hybrid) gegen das Rechts-Muster",cnt(7,10,"Startrichtung im Tor")),
+   B("Performance","lang",25,"Hit the windows, Randomizer-Übung 100–150 m",cnt(5,10,"innerhalb 10 m")),
+   B("Simulation Par 3","lang",10,"Par-3-Test 151–160 m mit 5er-Eisen oder Hybrid, max. 2 rechts vorbei",cnt(4,10,"innerhalb 15 m")),
+   B("Kurzes Spiel","kurz",35,"Leiter Chipping Drill, 2-Club Up&Down; jede 2. Woche 10er-Bunker-Aufgabe",cnt(5,10,"Up&Down")),
+   B("Putten Länge","putt",15,"Drei Zonen Drill 8–15 m",cnt(8,10,"innerhalb 1 m"))]},
+  C1:{n:"Golf C1 · 9 Loch Westplatz (Woche)",b:[
+   B("Einspielen","putt",10,"10 Putts aus 1–3 m, 5 Chips",chk("erledigt")),
+   B("9 Loch Westplatz Gelb 1–9","platz",90,"„Miss it!“: sichere Fehlseite links; Routine „10 Schritte“. Runde zusätzlich oben als Training erfassen.",mx(41,"Score (Halten ≤ 45)"),"s"),
+   B("Fairways","platz",0,"Abschläge auf Par 4/5",cnt(4,6,"Fairways"),"s"),
+   B("Doppelbogeys","platz",0,"kein Strafschlag, Bahn 6 (157 m) Grün oder Bogey",mx(1,"Doppelbogey+"),"s"),
+   B("Simulation Westplatz 1–9 (Range)","platz",60,"jede Bahn mit echter Schlägerwahl, Ziel und Routine",cnt(5,9,"Bahnen im Plan (Fairway + Grün)"),"w"),
+   B("Kurzes Spiel","kurz",20,"2-Club Up&Down",cnt(5,10,"Up&Down"),"w"),
+   B("Nachbereitung","platz",20,"die 2 teuersten Schläge nachtrainieren",chk("Fehler notiert"))]},
+  C2:{n:"Golf C2 · 9 Loch Ostplatz (Wochenende)",b:[
+   B("Einspielen","putt",10,"10 Putts aus 1–3 m, 5 Chips",chk("erledigt")),
+   B("9 Loch Ostplatz Gelb 1–9","platz",90,"„Miss it!“ + „10 Schritte“. Runde zusätzlich oben als Training erfassen.",mx(42,"Score (Halten ≤ 45)"),"s"),
+   B("Fairways","platz",0,"Abschläge auf Par 4/5",cnt(4,6,"Fairways"),"s"),
+   B("Doppelbogeys","platz",0,"kein Strafschlag",mx(1,"Doppelbogey+"),"s"),
+   B("Simulation Ostplatz 1–9 (Range)","platz",60,"jede Bahn mit echter Schlägerwahl, Ziel und Routine",cnt(5,9,"Bahnen im Plan"),"w"),
+   B("Putten","putt",20,"Leiter Putten, Pressure is on",cnt(12,20,"aus 2,5 m"),"w"),
+   B("Nachbereitung Putten & Chippen","kurz",20,"Fehler der Runde nachspielen",chk("erledigt"))]},
+  G1:{n:"Gym G1 · Rumpf & Rotation",b:[
+   B("Mobilisierung","kraft",10,"Cat-Cow, Oberkörperrotation Vierfüßler, 90/90, World’s Greatest Stretch",chk("erledigt")),
+   B("Zirkel Rumpf (4 Runden)","kraft",40,"Plank 60 s · Side Plank 40 s/Seite · Bird Dog 12/Seite · Russian Twists 20 (4 kg) · Ausfallschritt mit Rotation 10/Seite · Hip Bridge with Reach 12/Seite · Toe Taps 20",cnt(4,4,"Runden sauber")),
+   B("Cool-down","kraft",10,"Hüftbeuger-Stretch, Herabschauender Hund, Lendenwirbel-Streckung",chk("erledigt"))]},
+  G2:{n:"Gym G2 · Kraft",b:[
+   B("Mobilisierung","kraft",10,"Armkreisen, Beinpendel, 90/90, Spiderman",chk("erledigt")),
+   B("Kraft (3 Sätze)","kraft",40,"Weighted Squats 10 · Ausfallschritte 8/Seite · Schulterdrücken 10 · Kettlebell Swings 15 · Wadenheben 15 · Plank Shoulder Taps 20",cnt(3,3,"Sätze sauber")),
+   B("Cool-down","kraft",10,"wie G1",chk("erledigt"))]},
+  G3:{n:"Gym G3 · Speed & Mobilität",b:[
+   B("Mobilisierung","kraft",10,"Scorpion King, World’s Greatest Stretch, Beinpendel",chk("erledigt")),
+   B("Speed","kraft",35,"Speed Swing 5×5/Seite · Medicine Ball Slams 10 · Medizinball-Wurf seitlich 8/Seite · Box Jumps 5 · Skater Jumps 10 · Sprint-Intervalle 6×20 s",cnt(3,3,"Runden mit vollem Tempo")),
+   B("Mobilität & Cool-down","kraft",15,"Hüftbeuger-Stretch, Herabschauender Hund, Lendenwirbel-Streckung, Cat-Cow",chk("erledigt"))]}},
+  tests:[["drive","14 Drives im 30-m-Korridor",14,10],["appr","10 Bälle 151–160 m, innerhalb 15 m",10,5],["wedge","Wedge-Leiter 40/60/80/100 m, ±5 m",9,5],["putt","20 Putts aus 2,5 m",20,13],["ud","10 Up&Down aus 10–20 m",10,6],["bunker","10 Bunkerschläge, innerhalb 3 m",10,5],["plank","Plank-Haltezeit (Sek.)",0,120],["sg1","Arccos SG Abschlag",0,-1.0,-2.1],["sg2","Arccos SG Annäherung",0,-1.5,-3.3]]},
+ simon:{days:{1:["GA"],2:["GM","LG"],3:["GB","KS"],4:["GM","LG"],5:["GS"],6:["LS"],7:[]},units:{
+  LG:{n:"Leistungsgruppe",b:[B("Training Leistungsgruppe","gruppe",90,"nach Plan des Trainers",chk("teilgenommen"))]},
+  KS:{n:"Kurzes Spiel",b:[
+   B(MOB,"kurz",10,"World’s Greatest Stretch, 90/90, 10 Bälle",chk("aufgewärmt")),
+   B("Technik kurzes Spiel","kurz",15,"Stack and Carry, Hoch und Flach – alle Bälle aus dem Rough",cnt(8,10,"im 1-m-Landekreis")),
+   B("Performance kurzes Spiel","kurz",25,"Präzisions-Tor, Get in the hole, 2-Club Up&Down aus 9–23 m Rough",cnt(6,10,"Up&Down aus Rough")),
+   B("Kurze Putts unter Druck","putt",25,"Tiger Drill, Leiter Putten 1–2,5 m, 3-Ball Druck, Pressure is on",cnt(21,25,"aus 1,5–2 m")),
+   B("Bunker","kurz",15,"Par 10-Bunker-und-Up-and-Down-Challenge",cnt(5,10,"Up&Down aus Bunker"))]},
+  LS:{n:"Langes Spiel",b:[
+   B(MOB,"lang",10,"World’s Greatest Stretch, 90/90, 10 Bälle",chk("aufgewärmt")),
+   B("Driver","lang",20,"Zielkorridor-Challenge (25 m)",cnt(9,14,"im Korridor")),
+   B("Eisen","lang",15,"Hit the windows",cnt(6,10,"Fenster getroffen"),"s"),
+   B("Technik Hölzer","lang",20,"Tempo-Schwünge, Rotieren nicht Kippen",cnt(8,10,"sauberer Treffpunkt"),"w"),
+   B("Eisen","lang",20,"Hit the windows, Randomizer 100–160 m",cnt(6,10,"innerhalb 8 m"),"w"),
+   B("Simulation 3 Bahnen Westplatz","platz",20,"mit echter Schlägerwahl und Reset-Routine nach jedem Fehler",cnt(2,3,"Fairways"),"w"),
+   B("9 Loch Westplatz Schwarz oder Weiß 1–9","platz",70,"Turnierroutine; Par 5 (1, 5, 7) als Birdie-Löcher. Weiß: ≤ 35. Runde zusätzlich oben als Training erfassen.",mx(36,"Score Schwarz (Halten ≤ 39)"),"s"),
+   B("Kein zweites schlechtes Loch in Folge","platz",0,"Bounce back nach Bogey+",chk("geschafft"),"s")]},
+  GA:{n:"Gym · Rumpf A",b:[B("Rumpf A (2 Runden)","kraft",15,"Plank 60 s · Side Plank 30 s/Seite · Bird Dog 10/Seite · Toe Taps 20",cnt(2,2,"Runden sauber"))]},
+  GB:{n:"Gym · Rumpf B",b:[B("Rumpf B (2 Runden)","kraft",15,"Russian Twists 20 · Ausfallschritt mit Rotation 8/Seite · Medicine Ball Slams 10 (3 kg) · Medizinball-Wurf seitlich 8/Seite",cnt(2,2,"Runden sauber"))]},
+  GM:{n:"Gym · Mobilität",b:[B("Mobilität","kraft",15,"Cat-Cow, World’s Greatest Stretch, 90/90, Hüftbeuger-Stretch, Herabschauender Hund",chk("erledigt"))]},
+  GS:{n:"Gym · Speed",b:[B("Speed","kraft",15,"Speed Swing 3×5/Seite · Box Jumps 3×5 · Skater Jumps 2×10",cnt(3,3,"Sätze mit vollem Tempo"))]}},
+  tests:[["drive","14 Drives im Korridor",14,11],["appr","10 Bälle 151–160 m, innerhalb 15 m",10,7],["wedge","Wedge-Leiter 40/60/80/100 m, ±5 m",9,7],["putt","20 Putts aus 2,5 m",20,15],["ud","10 Up&Down aus 10–20 m",10,7],["bunker","10 Bunkerschläge, innerhalb 3 m",10,7],["plank","Plank-Haltezeit (Sek.)",0,150],["sg1","Arccos SG Abschlag",0,0,-1.0],["sg2","Arccos SG Kurzspiel",0,0,-1.3]]}
+};
+const PLAN=PLANS[CFG.id];
+const AREAS=[["lang","Langes Spiel"],["kurz","Kurzes Spiel"],["putt","Putten"],["platz","Platz"],["gruppe","Leistungsgruppe"],["kraft","Gym"]];
+const DN=["","Mo","Di","Mi","Do","Fr","Sa","So"];
+const isoToday=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const addDays=(iso,n)=>{const x=new Date(iso+"T12:00:00");x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+const dowOf=iso=>((new Date(iso+"T12:00:00").getDay()+6)%7)+1;
+const wkStart=iso=>addDays(iso,1-dowOf(iso));
+const ddmm=iso=>iso.slice(8,10)+"."+iso.slice(5,7)+".";
+const inSeason=iso=>{const m=+iso.slice(5,7);return m>=4&&m<=10};
+function blocksFor(k,iso){return PLAN.units[k].b.filter(b=>!b.sz||(b.sz==="s")===inSeason(iso))}
+let selDay=null,viewWk=null,tArmed=null,testMonth=isoToday().slice(0,7);
+function bOk(b,v){if(!b.s)return null;if(b.s.t==="chk")return v===true;if(v===""||v==null||isNaN(v))return null;return b.s.t==="cnt"?v>=b.s.g:v<=b.s.g}
+function sollTxt(b){return b.s.t==="chk"?b.s.l:b.s.t==="cnt"?`≥ ${b.s.g} von ${b.s.o} ${b.s.l}`:`≤ ${b.s.g} ${b.s.l}`}
+const slotOf=s=>s.slot||s.date;
+function sessStats(s){let ok=0,n=0,min=0;(s.blocks||[]).forEach(r=>{min+=+r.m||0;if(r.ok!=null){n++;if(r.ok)ok++}});return {ok,n,min}}
+function writeTrain(s){cacheLocal();if(!db)return;enqueue(()=>db.collection("training").doc(s.id).set(s))}
+function dropTrain(id){cacheLocal();if(!db)return;enqueue(()=>db.collection("training").doc(id).delete())}
+function writeTest(m){cacheLocal();if(!db)return;enqueue(()=>db.collection("tests").doc("m"+m).set({month:m,values:TESTS[m]||{}}))}
+function doneFor(slot,k){return TRAIN.find(s=>slotOf(s)===slot&&s.unit===k)}
+function renderTrain(){
+  const today=isoToday();if(!viewWk)viewWk=wkStart(today);if(!selDay)selDay=today;
+  const days=[...Array(7)].map((_,i)=>addDays(viewWk,i)),wkEnd=addDays(viewWk,7);
+  // Soll / Ist
+  const so={},ist={};days.forEach(d=>(PLAN.days[dowOf(d)]||[]).forEach(k=>blocksFor(k,d).forEach(b=>so[b.a]=(so[b.a]||0)+b.m)));
+  TRAIN.filter(s=>slotOf(s)>=viewWk&&slotOf(s)<wkEnd).forEach(s=>(s.blocks||[]).forEach(r=>{if(r.a)ist[r.a]=(ist[r.a]||0)+(+r.m||0)}));
+  const totS=Object.values(so).reduce((a,b)=>a+b,0),totI=Object.values(ist).reduce((a,b)=>a+b,0);
+  const planned=days.reduce((n,d)=>n+(PLAN.days[dowOf(d)]||[]).length,0),doneN=days.reduce((n,d)=>n+(PLAN.days[dowOf(d)]||[]).filter(k=>doneFor(d,k)).length,0);
+  $("tWeekHead").textContent=`${ddmm(viewWk)}–${ddmm(addDays(viewWk,6))} · ${doneN}/${planned} Einheiten · ${totI}/${totS} Min.${inSeason(viewWk)?" · Saison":" · Winter"}`;
+  $("tStrip").innerHTML=days.map(d=>{const ks=ord(PLAN.days[dowOf(d)]||[]);const all=ks.length&&ks.every(k=>doneFor(d,k)),some=ks.some(k=>doneFor(d,k));
+    return `<button class="dayb ${d===selDay?"sel":""} ${all?"done":some?"part":""} ${d===today?"today":""}" data-day="${d}"><span>${DN[dowOf(d)]}</span><b>${d.slice(8,10)}</b><em>${ks.length?ks.join("+"):"frei"}</em>${all?"<i>✓</i>":""}</button>`}).join("");
+  document.querySelectorAll("[data-day]").forEach(b=>b.addEventListener("click",()=>{selDay=b.dataset.day;renderTrain()}));
+  $("tWeek").innerHTML=AREAS.filter(([a])=>so[a]||ist[a]).map(([a,l])=>{const s=so[a]||0,i=ist[a]||0,p=s?Math.min(100,i/s*100):100;
+    return `<div class="wrow"><span>${l}</span><div class="wbar"><i style="width:${p}%;background:${i>=s?"var(--accent)":"var(--tee)"}"></i></div><b>${i} / ${s}</b></div>`}).join("");
+  // Tag
+  const ks=ord(PLAN.days[dowOf(selDay)]||[]);
+  $("tDayHead").textContent=`${selDay===today?"Heute":DN[dowOf(selDay)]} · ${ddmm(selDay)}${ks.length?"":" · kein Training geplant"}`;
+  const extra=ord(Object.keys(PLAN.units).filter(k=>!ks.includes(k)));
+  $("tDay").innerHTML=ks.map(k=>unitCard(k,selDay)).join("")+`<details class="xtra"><summary>Zusätzliche Einheit an diesem Tag</summary><div class="row" style="margin-top:8px">${extra.map(k=>`<button class="ghost small" data-xu="${k}">${esc(PLAN.units[k].n)}</button>`).join("")}</div><div id="tXtra"></div></details>`;
+  ks.forEach(k=>wireCard(k,selDay));
+  document.querySelectorAll("[data-xu]").forEach(b=>b.addEventListener("click",()=>{$("tXtra").innerHTML=unitCard(b.dataset.xu,selDay,true);wireCard(b.dataset.xu,selDay)}));
+  // Historie
+  const hist=TRAIN.slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:a.id<b.id?1:-1).slice(0,12);
+  $("tHist").innerHTML=hist.length?`<tr><th>Ist-Tag</th><th>Soll-Tag</th><th>Einheit</th><th>Min.</th><th>Soll erreicht</th><th></th></tr>`+hist.map(s=>{const st=sessStats(s),u=PLAN.units[s.unit];
+    return `<tr><td>${DN[dowOf(s.date)]} ${ddmm(s.date)}</td><td>${DN[dowOf(slotOf(s))]} ${ddmm(slotOf(s))}</td><td>${esc(u?u.n:s.unit)}</td><td>${st.min}</td><td><span class="pill ${st.n&&st.ok===st.n?"b8":"esr"}">${st.ok}/${st.n}</span>${s.note?` <span class="note">${esc(s.note)}</span>`:""}</td><td><button class="ghost small" data-del="${s.id}">${tArmed===s.id?"Wirklich?":"Löschen"}</button></td></tr>`}).join(""):`<tr><td class="note" style="white-space:normal">Noch keine Einheit erfasst.</td></tr>`;
+  document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{const id=b.dataset.del;if(tArmed!==id){tArmed=id;renderTrain();return}tArmed=null;TRAIN=TRAIN.filter(x=>x.id!==id);dropTrain(id);renderTrain()}));
+  // Leistungstest
+  const months=Object.keys(TESTS).filter(m=>m!==testMonth).sort().slice(-3);$("tMonth").value=testMonth;
+  $("tTests").innerHTML=`<tr><th>Test</th><th>Start</th><th>Ziel 06/27</th>${months.map(m=>`<th>${m.slice(5)}/${m.slice(2,4)}</th>`).join("")}<th>${testMonth.slice(5)}/${testMonth.slice(2,4)}</th></tr>`+PLAN.tests.map(([id,l,o,g,st])=>{
+    const cell=v=>v==null||v===""?"–":`<span style="color:${v>=g?"var(--accent)":"var(--ink)"};font-weight:${v>=g?700:400}">${String(v).replace(".",",")}${o?` / ${o}`:""}</span>`;const cur=(TESTS[testMonth]||{})[id];
+    return `<tr><td style="white-space:normal">${esc(l)}</td><td>${st!=null?String(st).replace(".",","):"messen"}</td><td>${String(g).replace(".",",")}${o?` / ${o}`:""}</td>${months.map(m=>`<td>${cell((TESTS[m]||{})[id])}</td>`).join("")}<td><input id="tt_${id}" inputmode="decimal" value="${cur==null?"":String(cur).replace(".",",")}" aria-label="${esc(l)}"></td></tr>`}).join("");
+  renderCurve();}
+const CURVE_START="2026-10-19";
+const isGym=k=>PLAN.units[k].b.every(b=>b.a==="kraft");
+const ord=ks=>ks.slice().sort((a,b)=>isGym(b)-isGym(a));
+function renderCurve(){
+  const today=isoToday(),end=[addDays(wkStart(today),6),addDays(CURVE_START,6)].sort().pop();
+  const dates=[];for(let d=CURVE_START;d<=end;d=addDays(d,1))dates.push(d);
+  const acc={g:{s:[],i:[]},t:{s:[],i:[]}};let sg=0,st=0,ig=0,it=0;
+  dates.forEach(d=>{(PLAN.days[dowOf(d)]||[]).forEach(k=>blocksFor(k,d).forEach(b=>{if(b.a==="kraft")sg+=b.m;else st+=b.m}));
+    TRAIN.filter(x=>x.date===d).forEach(x=>(x.blocks||[]).forEach(r=>{const m=+r.m||0;if(r.a==="kraft")ig+=m;else it+=m}));
+    acc.g.s.push(sg);acc.t.s.push(st);acc.g.i.push(d<=today?ig:null);acc.t.i.push(d<=today?it:null)});
+  const tIdx=dates.lastIndexOf(dates.filter(d=>d<=today).pop());
+  $("tCurve").innerHTML=curveSvg("Gym",acc.g,dates,tIdx)+curveSvg("Golftraining",acc.t,dates,tIdx)}
+function curveSvg(lbl,a,dates,tIdx){
+  const W=320,H=150,L=34,R=8,T=10,Bm=22,n=dates.length;
+  const mx=Math.max(60,...a.s,...a.i.filter(v=>v!=null)),top=Math.ceil(mx/60)*60;
+  const x=i=>L+i*(W-L-R)/(n-1),y=v=>T+(H-T-Bm)*(1-v/top);
+  const line=arr=>arr.map((v,i)=>v==null?null:`${x(i).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean).join(" ");
+  const sT=tIdx>=0?a.s[tIdx]:0,iT=tIdx>=0?a.i[tIdx]:0,p=sT?Math.round(iT/sT*100):null;
+  const col=p==null?"var(--muted)":p>=90?"var(--accent)":p>=60?"var(--tee)":"var(--warn)";
+  const grid=[0,top/2,top].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-4}" y="${y(v)+3}" text-anchor="end" font-size="9" fill="var(--muted)">${String(+(v/60).toFixed(1)).replace(".",",")} h</text>`).join("");
+  const mon=dates.map((d,i)=>dowOf(d)===1?`<line x1="${x(i)}" x2="${x(i)}" y1="${T}" y2="${H-Bm}" stroke="var(--line)" stroke-dasharray="2 3"/>`:"").join("");
+  const lab=[0,n-1].map(i=>`<text x="${x(i)}" y="${H-6}" text-anchor="${i?"end":"start"}" font-size="9" fill="var(--muted)">${ddmm(dates[i])}</text>`).join("");
+  const dot=tIdx>=0?`<circle cx="${x(tIdx)}" cy="${y(a.i[tIdx])}" r="3.5" fill="${col}"/>`:"";
+  const head=tIdx<0?"Start am Mo 19.10.":`bis heute ${iT} / ${sT} Min.${p!=null?` · ${p} %`:""}`;
+  return `<div class="ucard"><div class="row between"><h3>${lbl}</h3><span class="note" style="color:${col};font-weight:600">${head}</span></div>
+   <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="${lbl}: Soll-Ist-Kurve">${grid}${mon}
+   <polyline points="${line(a.s)}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 4"/>
+   <polyline points="${line(a.i)}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>${dot}${lab}</svg></div>`}
+function unitCard(k,slot,isExtra){const u=PLAN.units[k],done=doneFor(slot,k),id=k+"_"+slot.replace(/-/g,"");
+  if(done&&!isExtra){const st=sessStats(done);return `<div class="ucard done"><div class="row between"><h3>${esc(u.n)}</h3><span class="pill b8">✓ erledigt</span></div><p class="note">am ${DN[dowOf(done.date)]} ${ddmm(done.date)} · ${st.min} Min. · ${st.ok} von ${st.n} Soll-Werten erreicht${done.note?" · "+esc(done.note):""}</p></div>`}
+  const bs=blocksFor(k,slot),wk=wkStart(slot);
+  return `<div class="ucard" id="uc_${id}"><div class="row between"><h3>${esc(u.n)}</h3><span class="note">Soll: ${DN[dowOf(slot)]} ${ddmm(slot)} · ${bs.reduce((a,b)=>a+b.m,0)} Min.</span></div>
+   <ol class="clist">${bs.map((b,i)=>`<li>
+     <label class="cl-top"><input type="checkbox" id="${id}_c${i}"><span><b>${esc(b.n)}</b><br><span class="note">${esc(b.d)}</span></span></label>
+     <div class="cl-grid">${b.m?`<span>Soll ${b.m} Min.</span><label>Ist Min.<input id="${id}_m${i}" inputmode="numeric" value="${b.m}"></label>`:"<span></span><span></span>"}
+       <span>Soll ${esc(sollTxt(b))}</span>${b.s.t==="chk"?`<span class="note">mit Haken erreicht</span>`:`<label>Ist<input id="${id}_v${i}" inputmode="numeric"></label>`}<span id="${id}_o${i}"></span></div></li>`).join("")}</ol>
+   <div class="form"><label>Ist-Tag<input type="date" id="${id}_date" value="${isoToday()<slot?slot:isoToday()}"></label>
+     <label>zählt für Soll-Tag<select id="${id}_slot">${[...Array(7)].map((_,i)=>{const d=addDays(wk,i);return `<option value="${d}" ${d===slot?"selected":""}>${DN[i+1]} ${ddmm(d)}${(PLAN.days[i+1]||[]).includes(k)?" (geplant)":""}</option>`}).join("")}</select></label>
+     <label>Notiz<input id="${id}_note" autocomplete="off"></label></div>
+   <div class="row"><button id="${id}_save">Einheit speichern</button><span class="note" id="${id}_msg"></span></div></div>`}
+function wireCard(k,slot){const id=k+"_"+slot.replace(/-/g,"");if(!$(id+"_save"))return;const bs=blocksFor(k,slot);
+  const upd=i=>{const b=bs[i];const v=b.s.t==="chk"?$(id+"_c"+i).checked:parseFloat(String(($(id+"_v"+i)||{}).value||"").replace(",","."));const o=bOk(b,v);
+    if(b.s.t!=="chk"&&!isNaN(v))$(id+"_c"+i).checked=true;$(id+"_o"+i).innerHTML=o==null?"":o?'<span class="pill b8">✓ Soll</span>':'<span class="pill esr">unter Soll</span>'};
+  bs.forEach((b,i)=>{$(id+"_c"+i).addEventListener("change",()=>upd(i));const v=$(id+"_v"+i);if(v)v.addEventListener("input",()=>upd(i))});
+  $(id+"_save").addEventListener("click",()=>{const blocks=bs.map((b,i)=>{const c=$(id+"_c"+i).checked;const m=b.m?(c?parseFloat(String($(id+"_m"+i).value).replace(",","."))||0:0):0;
+      const v=b.s.t==="chk"?c:(($(id+"_v"+i).value||"")===""?null:parseFloat(String($(id+"_v"+i).value).replace(",",".")));return {n:b.n,a:b.a,m,v,done:c,ok:bOk(b,v)}});
+    if(!blocks.some(x=>x.done)){$(id+"_msg").textContent="Mindestens einen Block abhaken.";return}
+    const s={id:"t"+Date.now().toString(36),date:$(id+"_date").value||isoToday(),slot:$(id+"_slot").value,unit:k,blocks,note:$(id+"_note").value.trim()};
+    TRAIN=[...TRAIN,s];writeTrain(s);const st=sessStats(s);$("tMsg").textContent=`${PLAN.units[k].n} gespeichert: ${st.min} Min., ${st.ok} von ${st.n} Soll-Werten erreicht.`;selDay=s.slot;renderTrain()})}
+function saveTests(){const vals={};PLAN.tests.forEach(([id])=>{const v=$("tt_"+id).value.trim();if(v!=="")vals[id]=parseFloat(v.replace(",","."))});TESTS={...TESTS,[testMonth]:vals};writeTest(testMonth);$("tTestMsg").textContent="Leistungstest gespeichert";renderTrain()}
+$("tPrev").addEventListener("click",()=>{viewWk=addDays(viewWk,-7);selDay=viewWk;renderTrain()});
+$("tNext").addEventListener("click",()=>{viewWk=addDays(viewWk,7);selDay=viewWk;renderTrain()});
+$("tToday").addEventListener("click",()=>{viewWk=wkStart(isoToday());selDay=isoToday();renderTrain()});
+$("tTestSave").addEventListener("click",saveTests);$("tMonth").addEventListener("change",e=>{if(/^\d{4}-\d{2}$/.test(e.target.value)){testMonth=e.target.value;renderTrain()}});
+
 /* ---------- Gesamtansicht ---------- */
 function render(){
   $("who").textContent=CFG.who;$("recNote").textContent=CFG.recNote;
@@ -411,6 +698,11 @@ function render(){
   renderCourses();
   if(!on){["hcpi","low","soft"].forEach(id=>$(id).textContent="–");$("vorg").innerHTML="";$("preview").textContent="Noch kein Stammblatt hinterlegt. Lade unten eine Sicherung.";$("add").disabled=true;$("scen").innerHTML="";$("rec").innerHTML="";$("chart").innerHTML="";renderDev();return}
   const h=hcpiOf(S.rec,S.low),cs=courses();
+  { const G=goal(),span=G.start-G.h,pr=span>0?Math.max(0,Math.min(1,(G.start-h)/span)):0,dd=new Date(G.date+"T12:00:00"),days=Math.round((dd-new Date())/864e5);
+    $("goalTitle").textContent=`Ziel HCPI ${fmt(G.h)} bis ${G.date.split("-").reverse().join(".")}`;$("goalFill").style.width=(pr*100).toFixed(1)+"%";
+    $("goalFrom").textContent="Start "+fmt(G.start);$("goalTo").textContent="Ziel "+fmt(G.h);
+    $("goalInfo").innerHTML=`<b style="color:var(--ink)">${fmt(h)}</b> · noch ${fmt(Math.max(0,r1(h-G.h)))} · ${Math.round(pr*100)} % geschafft${days>0?` · ${days} Tage`:""}`;
+    if(document.activeElement?.closest?.("#goalForm")==null){$("goalH").value=String(G.h).replace(".",",");$("goalD").value=G.date;$("goalS").value=String(G.start).replace(".",",")} }
   $("hcpi").textContent=fmt(h);$("low").textContent=fmt(S.low);$("soft").textContent=fmt(r1(S.low+3));
   $("vorg").innerHTML=CFG.fav.filter(k=>cs[k]).map(k=>`<div><span>Vorgabe ${esc(cs[k].name)} ${esc(cs[k].tee)}${cs[k].holes===9?" 9 L":""}</span><b>${courseHcp(cs[k],h)}</b></div>`).join("");
   if($("phCell"))$("phCell").textContent=courseHcp(curCourse(),h);
@@ -427,10 +719,10 @@ function render(){
   document.querySelectorAll("#rec input").forEach(inp=>inp.addEventListener("change",e=>{const i=+e.target.dataset.i,v=parseFloat(String(e.target.value).replace(",","."));if(!isNaN(v)){S.rec[i].sd=v;writeState();render()}}));
   // Verlauf
   const HH=S.hist,W=Math.max(320,HH.length*46),ht=170,p={l:34,r:14,t:14,b:26},vals=HH.map(x=>x.h);
-  const mn=Math.floor(Math.min(...vals,CFG.goal??Math.min(...vals))-0.5),mx=Math.ceil(Math.max(...vals)+0.5);
+  const GH=goal().h;const mn=Math.floor(Math.min(...vals,GH)-0.5),mx=Math.ceil(Math.max(...vals)+0.5);
   const xs=i=>p.l+(HH.length<2?0:i*(W-p.l-p.r)/(HH.length-1)),ys=v=>p.t+(mx-v)*(ht-p.t-p.b)/(mx-mn);
   let g="";for(let v=mn;v<=mx;v++){if((v-mn)%Math.max(1,Math.ceil((mx-mn)/5)))continue;g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${p.l-6}" y="${ys(v)+4}" text-anchor="end">${v}</text>`}
-  if(CFG.goal!=null)g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(CFG.goal)}" y2="${ys(CFG.goal)}" stroke="var(--tee)" stroke-dasharray="4 4"/><text x="${W-p.r}" y="${ys(CFG.goal)-5}" text-anchor="end">Ziel ${CFG.goal}</text>`;
+  g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(GH)}" y2="${ys(GH)}" stroke="var(--tee)" stroke-dasharray="4 4"/><text x="${W-p.r}" y="${ys(GH)-5}" text-anchor="end">Ziel ${fmt(GH)}</text>`;
   g+=`<path d="${HH.map((x,i)=>`${i?"L":"M"}${xs(i)},${ys(x.h)}`).join("")}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`+HH.map((x,i)=>`<circle cx="${xs(i)}" cy="${ys(x.h)}" r="${i===HH.length-1?5:3}" fill="var(--accent)"/>`).join("");
   const step=Math.max(1,Math.ceil(HH.length/12));HH.forEach((x,i)=>{if(i%step&&i!==HH.length-1)return;g+=`<text x="${xs(i)}" y="${ht-6}" text-anchor="middle">${esc(x.l||"")}</text>`});
   const last=HH[HH.length-1];g+=`<text x="${xs(HH.length-1)}" y="${ys(last.h)-10}" text-anchor="${HH.length>1?"end":"start"}" style="fill:var(--ink);font-weight:700">${fmt(last.h)}</text>`;
@@ -454,14 +746,20 @@ $("score").addEventListener("input",updateLive);$("nRounds").addEventListener("c
 function setMode(m){mode=m;$("mHoles").setAttribute("aria-pressed",m==="holes");$("mTotal").setAttribute("aria-pressed",m==="total");
   $("holeBox").hidden=$("holeNote").hidden=m!=="holes";$("totalBox").hidden=m!=="total";$("summary").innerHTML="";updateLive()}
 $("mHoles").addEventListener("click",()=>setMode("holes"));$("mTotal").addEventListener("click",()=>setMode("total"));
-$("add").addEventListener("click",saveRound);$("undo").addEventListener("click",undoLast);
+$("add").addEventListener("click",saveRound);
+const TYPE_NOTE={turnier:"Zählt für dein Stammblatt und den HCPI.",privat:"Vorab angemeldete Privatrunde mit Zähler. Zählt für Stammblatt und HCPI.",training:"Zählt nicht für den HCPI. Fließt in Statistik, Trainings-HCPI und Zielabstand ein."};
+document.querySelectorAll("#typeSeg button").forEach(b=>b.addEventListener("click",()=>{rtype=b.dataset.type;document.querySelectorAll("#typeSeg button").forEach(x=>x.setAttribute("aria-pressed",x===b));$("typeNote").textContent=TYPE_NOTE[rtype];updateLive()}));
+document.querySelectorAll("#filtSeg button").forEach(b=>b.addEventListener("click",()=>{filt=b.dataset.f;document.querySelectorAll("#filtSeg button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderDev()}));
+$("goalEdit").addEventListener("click",()=>{$("goalForm").hidden=!$("goalForm").hidden});
+$("goalSave").addEventListener("click",()=>{const num=v=>parseFloat(String(v).replace(",","."));const gh=num($("goalH").value),gs=num($("goalS").value),gd=$("goalD").value;
+  if(isNaN(gh)||isNaN(gs)||!gd)return;S.goal={h:gh,start:gs,date:gd};writeState();$("goalForm").hidden=true;render()});$("undo").addEventListener("click",undoLast);
 $("newCourse").addEventListener("click",()=>openCourse(null));$("cfCancel").addEventListener("click",()=>{$("courseForm").hidden=true});
 $("cfHoles").addEventListener("change",()=>cfGrid(+$("cfHoles").value,null));$("cfSave").addEventListener("click",saveCourse);
 $("cfDelete").addEventListener("click",e=>{const b=e.target;if(!b.dataset.armed){b.dataset.armed="1";b.textContent="Wirklich?";return}
   const n={...CUSTOM};delete n[editId];CUSTOM=n;dropCourse(editId);$("courseForm").hidden=true;fillCourseSelect();buildHoleGrid();render()});
 $("copy").addEventListener("click",()=>{const t=$("backup");if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>$("msg").textContent="Kopiert",()=>{t.select();$("msg").textContent="Text markiert, bitte kopieren"});else t.select()});
-function fullBackup(){return {app:"golf-tracker",v:3,S:{rec:S.rec,hist:S.hist,low:S.low},ROUNDS,CUSTOM}}
-function applyBackup(txt){try{const o=JSON.parse(txt);if(o.S&&o.S.rec){S={...o.S,undo:[]};ROUNDS=o.ROUNDS||[];CUSTOM=o.CUSTOM||{}}else if(o.rec){S={...o,undo:[]}}else throw 0;
+function fullBackup(){return {app:"golf-tracker",v:4,S:{rec:S.rec,hist:S.hist,low:S.low,goal:S.goal||null},ROUNDS,CUSTOM,TRAIN,TESTS}}
+function applyBackup(txt){try{const o=JSON.parse(txt);if(o.S&&o.S.rec){S={...o.S,undo:[]};ROUNDS=o.ROUNDS||[];CUSTOM=o.CUSTOM||{};TRAIN=o.TRAIN||[];TESTS=o.TESTS||{}}else if(o.rec){S={...o,undo:[]}}else throw 0;
   cacheLocal();fillCourseSelect();buildHoleGrid();render();$("msg").textContent="Sicherung geladen"}catch(e){$("msg").textContent="Das ist keine gültige Sicherung"}}
 $("restore").addEventListener("click",()=>applyBackup($("backup").value));
 $("dl").addEventListener("click",()=>{const b=new Blob([JSON.stringify(fullBackup())],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);
@@ -469,7 +767,7 @@ $("dl").addEventListener("click",()=>{const b=new Blob([JSON.stringify(fullBacku
 $("ul").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>applyBackup(r.result);r.readAsText(f);e.target.value=""});
 
 /* ---------- Start ---------- */
-try{const loc=JSON.parse(localStorage.getItem(LKEY));if(loc){S=loc.S||null;ROUNDS=loc.ROUNDS||[];CUSTOM=loc.CUSTOM||{}}}catch(e){}
+try{const loc=JSON.parse(localStorage.getItem(LKEY));if(loc){S=loc.S||null;ROUNDS=loc.ROUNDS||[];CUSTOM=loc.CUSTOM||{};TRAIN=loc.TRAIN||[];TESTS=loc.TESTS||{}}}catch(e){}
 if(!S){S=JSON.parse(JSON.stringify(SEED));cacheLocal()}
 fillCourseSelect();buildHoleGrid();render();
 
