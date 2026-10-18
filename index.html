@@ -160,7 +160,11 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;c
   </section>
 
   <section id="secHist">
-    <h2>HCPI-Verlauf</h2>
+    <h2>Verlauf</h2>
+    <h3>Letzte 20 Runden</h3>
+    <div class="chartbox" id="sdChart"></div>
+    <p class="note">Gewertetes Score Differential je Runde, älteste links. Grün = zählt zu den besten 8, gestrichelt = aktueller HCPI.</p>
+    <h3>HCPI-Entwicklung</h3>
     <div class="chartbox" id="chart"></div>
   </section>
 
@@ -219,7 +223,10 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;c
 </div>
 
 <script>
-const SH="Berliner GC Stolper Heide", BS="Golf Club Bad Saarow";
+const SH="Berliner GC Stolper Heide", BS="Golf Club Bad Saarow", GT="Berliner Golf Club Gatow", MZ="Berliner G&CC Motzener See";
+const GP=[4,4,5,3,4,5,3,4,4,4,4,3,4,4,5,3,5,4], GSI=[3,5,15,17,13,9,7,1,11,2,14,18,10,8,4,16,6,12];
+const MA=[4,5,3,4,5,4,3,5,4], MAS=[17,15,11,1,13,7,9,5,3], MB=[4,4,5,3,4,3,5,4,4], MBS1=[16,6,2,18,8,12,14,10,4], MBS2=[15,5,1,17,7,11,13,9,3];
+const MC=[3,5,4,5,4,4,4,3,5], MCS=[16,10,8,4,2,14,6,18,12];
 const WP=[5,4,4,3,5,3,5,3,4,4,5,3,4,3,4,5,4,4], WSI=[9,13,5,11,17,15,1,3,7,2,12,18,8,16,10,14,4,6];
 const OP=[4,4,3,5,4,4,4,3,5,4,4,5,4,3,4,4,3,5], OSI=[5,3,17,7,11,13,1,9,15,2,14,18,4,12,16,6,8,10];
 const FP=[5,4,3,4,3,5,4,4,4,5,5,4,3,4,4,4,3,4], FSI=[11,5,17,9,13,7,1,15,3,6,2,14,8,12,10,16,18,4];
@@ -231,7 +238,17 @@ const PRESETS={
   ost9:{club:SH,name:"Ostplatz 1–9",tee:"Gelb",holes:9,cr:36.1,s:131,par:OP.slice(0,9),si:[3,2,9,4,6,7,1,5,8]},
   west9:{club:SH,name:"Westplatz 1–9",tee:"Gelb",holes:9,cr:35.9,s:126,par:WP.slice(0,9),si:[5,8,3,6,9,7,1,2,4],check:"CR/Slope geschätzt"},
   faldoG:{club:BS,name:"Faldo Course",tee:"Gelb",holes:18,cr:73.4,s:139,par:FP,si:FSI,check:"Lochdaten aus öffentlicher Quelle"},
-  faldoW:{club:BS,name:"Faldo Course",tee:"Weiß",holes:18,cr:75.2,s:150,par:FP,si:FSI,check:"CR/Slope geschätzt"}
+  faldoW:{club:BS,name:"Faldo Course",tee:"Weiß",holes:18,cr:75.2,s:150,par:FP,si:FSI,check:"CR/Slope geschätzt"},
+  ostW:{club:SH,name:"Ostplatz",tee:"Weiß",holes:18,cr:74.3,s:129,par:OP,si:OSI,check:"Hcp-Reihenfolge Loch 10–18 aus älterer Quelle"},
+  gatowG:{club:GT,name:"Gatow",tee:"Gelb",holes:18,cr:71.3,s:126,par:GP,si:GSI,check:"Lochdaten aus öffentlicher Quelle"},
+  gatowB:{club:GT,name:"Gatow",tee:"Blau",holes:18,cr:69.5,s:124,par:GP,si:GSI,check:"Lochdaten aus öffentlicher Quelle"},
+  motzABW:{club:MZ,name:"A+B",tee:"Weiß",holes:18,cr:75.1,s:135,par:[...MA,...MB],si:[...MAS,...MBS1]},
+  motzABG:{club:MZ,name:"A+B",tee:"Gelb",holes:18,cr:72.5,s:140,par:[...MA,...MB],si:[...MAS,...MBS1],check:"CR/Slope Gelb aus älterer Quelle"},
+  motzACW:{club:MZ,name:"A+C",tee:"Weiß",holes:18,cr:75.4,s:137,par:[...MA,...MC],si:[...MAS,...MCS]},
+  motzACG:{club:MZ,name:"A+C",tee:"Gelb",holes:18,cr:72.6,s:142,par:[...MA,...MC],si:[...MAS,...MCS],check:"CR/Slope Gelb aus älterer Quelle"},
+  motzBCW:{club:MZ,name:"B+C",tee:"Weiß",holes:18,cr:75.3,s:138,par:[...MB,...MC],si:[...MBS2,...MCS]},
+  motzBCG:{club:MZ,name:"B+C",tee:"Gelb",holes:18,cr:72.6,s:139,par:[...MB,...MC],si:[...MBS2,...MCS],check:"CR/Slope Gelb aus älterer Quelle"},
+  motzA9G:{club:MZ,name:"A 1–9",tee:"Gelb",holes:9,cr:36.3,s:139,par:MA,si:[9,8,6,1,7,4,5,3,2]}
 };
 const SEED={"rec":[{"d":"17.10.26","l":"Faldo Weiß · 73","sd":-1.7,"adj":-2,"esr":-2},{"d":"16.10.26","l":"After Work 9 L · 37","sd":6.7,"adj":-2},{"d":"19.09.26","l":"End of Summer · 87","sd":13.7,"adj":-2},{"d":"12.09.26","l":"Jugendcup 9 L · 37","sd":7.5,"adj":-2},{"d":"30.08.26","l":"Clubmeisterschaft · 88","sd":13.7,"adj":-2},{"d":"29.08.26","l":"Clubmeisterschaft · 81","sd":8.3,"adj":-2},{"d":"20.08.26","l":"GVBB Gatow · 88","sd":15,"adj":-2},{"d":"19.08.26","l":"GVBB Gatow · 84","sd":11.4,"adj":-2},{"d":"18.08.26","l":"GVBB Gatow · 81","sd":8.7,"adj":-2},{"d":"05.08.26","l":"Offener Mittwoch · 92","sd":17.3,"adj":-2},{"d":"21.06.26","l":"Monatspreis S · 82","sd":9.2,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9.2,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9.4,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":11,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":12.5,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":14,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":15.5,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":16,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":17,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":18,"adj":0}],"hist":[{"l":"Start","h":8.5},{"l":"17.10.26","h":5.1}],"low":5.1,"undo":[]};
 const CFG={"id": "simon", "who": "Simon Steiner · Berliner GC Stolper Heide", "fav": ["westW", "westS", "ost18", "faldoW"], "scen": ["westW", "westS", "ost18", "faldoW"], "goal": null, "typical": 12.0, "typicalText": "Spielt Simon auf seinem bisherigen Niveau (Ø SD ≈ 12, rund 85 vom Weiß West),", "recNote": "Ausgangswerte aus dem Scoring Record (Seite 1 exakt, Seite 2 geschätzt). Die Faldo-Runde (73 vom Weiß) ist mit dem geschätzten Rating 75,2/150 eingerechnet; bitte mit golf.de abgleichen.", "def": "westW"};
@@ -364,9 +381,9 @@ function renderDev(){const rs=ROUNDS.filter(r=>r.dist).sort((a,b)=>a.date<b.date
       <td>${r.dist.eagle||""}</td><td>${r.dist.birdie||""}</td><td>${r.dist.par||""}</td><td>${r.dist.bogey||""}</td><td>${r.dist.double||""}</td><td>${(r.dist.triple+r.dist.pick)||""}</td><td>${fmt(r.sd)}</td></tr>`).join("")}
 
 /* ---------- Plätze verwalten ---------- */
-function renderCourses(){const cs=courses();
-  $("courseTbl").innerHTML=`<tr><th>Platz</th><th>Club</th><th>CR / Slope</th><th>Par</th><th></th></tr>`+Object.entries(cs).map(([id,c])=>
-    `<tr><td>${esc(cLabel(c))}${c.check?`<br><span class="flag">${esc(c.check)}, bitte prüfen</span>`:""}</td><td>${esc(c.club)}</td><td>${String(c.cr).replace(".",",")} / ${c.s}</td><td>${parSum(c)}</td>
+function renderCourses(){const cs=courses(),hh=S&&S.rec&&S.rec.length?hcpiOf(S.rec,S.low):null;
+  $("courseTbl").innerHTML=`<tr><th>Platz</th><th>Club</th><th>CR / Slope</th><th>Par</th><th>Vorgabe</th><th></th></tr>`+Object.entries(cs).map(([id,c])=>
+    `<tr><td>${esc(cLabel(c))}${c.check?`<br><span class="flag">${esc(c.check)}, bitte prüfen</span>`:""}</td><td>${esc(c.club)}</td><td>${String(c.cr).replace(".",",")} / ${c.s}</td><td>${parSum(c)}</td><td><b>${hh==null?"–":courseHcp(c,hh)}</b></td>
      <td><button class="ghost small" data-edit="${id}">Bearbeiten</button></td></tr>`).join("");
   document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>openCourse(b.dataset.edit)))}
 function cfGrid(n,c){const par=c?c.par:Array(n).fill(4),si=c?c.si:Array.from({length:n},(_,i)=>i+1);
@@ -415,8 +432,18 @@ function render(){
   let g="";for(let v=mn;v<=mx;v++){if((v-mn)%Math.max(1,Math.ceil((mx-mn)/5)))continue;g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${p.l-6}" y="${ys(v)+4}" text-anchor="end">${v}</text>`}
   if(CFG.goal!=null)g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(CFG.goal)}" y2="${ys(CFG.goal)}" stroke="var(--tee)" stroke-dasharray="4 4"/><text x="${W-p.r}" y="${ys(CFG.goal)-5}" text-anchor="end">Ziel ${CFG.goal}</text>`;
   g+=`<path d="${HH.map((x,i)=>`${i?"L":"M"}${xs(i)},${ys(x.h)}`).join("")}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`+HH.map((x,i)=>`<circle cx="${xs(i)}" cy="${ys(x.h)}" r="${i===HH.length-1?5:3}" fill="var(--accent)"/>`).join("");
+  const step=Math.max(1,Math.ceil(HH.length/12));HH.forEach((x,i)=>{if(i%step&&i!==HH.length-1)return;g+=`<text x="${xs(i)}" y="${ht-6}" text-anchor="middle">${esc(x.l||"")}</text>`});
   const last=HH[HH.length-1];g+=`<text x="${xs(HH.length-1)}" y="${ys(last.h)-10}" text-anchor="${HH.length>1?"end":"start"}" style="fill:var(--ink);font-weight:700">${fmt(last.h)}</text>`;
   $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${ht}" width="${W}" height="${ht}" role="img" aria-label="HCPI-Verlauf">${g}</svg>`+(HH.length<2?'<p class="note">Sobald du Runden speicherst, entsteht hier deine Kurve.</p>':"");
+  { const R=S.rec.slice(0,20).map((o,i)=>({v:r1(o.sd+o.adj),d:o.d,b:best.includes(i)})).reverse();
+    const bw=24,gp=8,H2=190,pl=34,W2=Math.max(320,pl+R.length*(bw+gp)+8),vs=R.map(x=>x.v);
+    const lo=Math.min(0,Math.floor(Math.min(...vs,h)-1)),hi=Math.ceil(Math.max(...vs,h)+1),y=v=>12+(hi-v)*(H2-44)/(hi-lo);
+    let g2="",stp=Math.max(1,Math.ceil((hi-lo)/6));for(let v=Math.ceil(lo/stp)*stp;v<=hi;v+=stp)g2+=`<line x1="${pl}" x2="${W2}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl-5}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+    R.forEach((x,i)=>{const X=pl+6+i*(bw+gp),top=Math.min(y(x.v),y(0)),ht2=Math.max(1,Math.abs(y(0)-y(x.v)));
+      g2+=`<rect x="${X}" y="${top}" width="${bw}" height="${ht2}" rx="2" fill="${x.b?"var(--accent)":"var(--c-par)"}"/><text x="${X+bw/2}" y="${top-4}" text-anchor="middle" style="fill:var(--ink);font-size:10px">${fmt(x.v)}</text>`;
+      if(x.d)g2+=`<text x="${X+bw/2}" y="${H2-18}" text-anchor="middle" style="font-size:9.5px">${esc(String(x.d).slice(0,5))}</text>`});
+    g2+=`<line x1="${pl}" x2="${W2}" y1="${y(h)}" y2="${y(h)}" stroke="var(--tee)" stroke-width="2" stroke-dasharray="5 4"/><text x="${W2-4}" y="${y(h)-5}" text-anchor="end" style="fill:var(--ink);font-weight:700">HCPI ${fmt(h)}</text>`;
+    $("sdChart").innerHTML=`<svg viewBox="0 0 ${W2} ${H2}" width="${W2}" height="${H2}" role="img" aria-label="Differentials der letzten 20 Runden">${g2}</svg>`;}
   if(document.activeElement!==$("backup"))$("backup").value=JSON.stringify(fullBackup());
   renderDev()}
 
