@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Golf Simon">
+<meta name="theme-color" content="#1f6b45">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADkklEQVR4nO3dQW7lRBiF0deo9wE7YURvBpbDapoRO2EpDCxZFun7cPIcu275nGky+Kv8VVmKkpcvP//+2wN+5KerB2Bc4iASB5E4iMRBJA4icRCJg0gcROIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDiJxEImDSBxE4iASB5E4iMRBJA4icRCJg0gcROIgEgeROIjEQSQOInEQfb16gCv98+f3Pd/2yx/fPnuSMX2524fU7gwiuVUod4njxSbeukMl88dxeBZbcycycxyfmsXWrInMGcdpWWzNl8hscVySxdZMiUz1c47LyxhkhqPME8c4T2WcSV40w2tl2IfR/oqpvzmGLeMx9mx7dMcx/u6PP+ETxXG07HvLnG+1xtG1413Trlrj4ASVcTQexMaZ++Jo3OVF3eRlcdTt7390zV8WB2dqiqPr2CVFq2iKg5PVxFF04P5Xy1pq4uB8HXG0HLX9KlbUEQeXKIij4pB9wPjrKoiDq4iDaPQ4xr97XzH46kaPgwuJg0gcREPHMfgr+RAjr3HoOLiWOIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDqKh42j/TK09Rl7j0HFwLXEQiYNo9DhGfiW/bvDVjR4HFxIHUUEcg9+9Hzb+ugri4CodcYx/yN6rYkUdcXCJmjgqjtpOLWupiYPzNcXRcuCeK1pFUxycrCyOomP3Q13zl8XxaNvfrbrJ++J4FO7yo3Pmyjg4R2scXQexa9pVaxyPnh1vmfOt4jgeDfs+/oRPdMfxGHv3R55tjxn+XfliqA/Xas9iUX9zrMZ5HuNM8qJ54niM8VRGmOEo87xWti55xcyUxWLOOBanJTJfFouZ41h8aiKzZrGYP47F4YnMncXiLnGsXqzkDk2sbhfH1s5QbhXE1q3j4LmvVw9wvb+//ZW+9Ov3W58ccTyzdnPPSsSxy/Z2uU8o4ni3+1wn4vi46a8TcRxjyutEHAeb6ToRxydqv07EcYbS60QcZygKYkscn6i0iZU4DtYexJY4jjFTEytxfNyUQWyJ492mb2Iljl3uE8SWOJ65ZxOrqf6oiWOJg0gcROIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDiK/7HP33+h5ws1BJA4icRCJg0gcROIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDiJxEImDSBxE4iASB5E4iMRBJA4icRCJg+hf8/S7nS6IcTcAAAAASUVORK5CYII=">
+<title>Golf-Tracker Simon</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: Scorekarten-Logik – Kopf mit HCPI, Erfassen Loch für Loch, Entwicklung, Szenarien, Stammblatt, Plätze */
+:root{
+  --bg:#f2f4ef; --surface:#ffffff; --ink:#17211b; --muted:#5a6a60; --line:#d5ddd3;
+  --accent:#1f6b45; --accent-soft:#e3efe6; --tee:#e0b100; --tee-soft:#fbf3cf; --warn:#b4561f;
+  --c-eagle:#1d6fd1; --c-birdie:#7db7ec; --c-par:#a3aca6; --c-bogey:#f2b636; --c-double:#e8622c; --c-triple:#8a3b12; --c-on:#ffffff; --c-on-light:#17211b;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1512; --surface:#17201b; --ink:#e6eee8; --muted:#9caca1; --line:#2b372f;
+  --accent:#62c08c; --accent-soft:#1d3327; --tee:#e9c53c; --tee-soft:#3a3315; --warn:#e8945f;
+  --c-eagle:#4f97ec; --c-birdie:#8cc4f2; --c-par:#7d8781; --c-bogey:#e9b84a; --c-double:#ea7444; --c-triple:#b65a2c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1512; --surface:#17201b; --ink:#e6eee8; --muted:#9caca1; --line:#2b372f;
+  --accent:#62c08c; --accent-soft:#1d3327; --tee:#e9c53c; --tee-soft:#3a3315; --warn:#e8945f;
+  --c-eagle:#4f97ec; --c-birdie:#8cc4f2; --c-par:#7d8781; --c-bogey:#e9b84a; --c-double:#ea7444; --c-triple:#b65a2c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:max(40px,env(safe-area-inset-bottom,0px))}
+.wrap{max-width:780px;margin:0 auto;display:grid;gap:18px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;margin:0;text-wrap:balance}
+h2{font-size:1.35rem} h3{font-size:1.1rem}
+.eyebrow{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.num,td,th{font-variant-numeric:tabular-nums}
+.head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.big{font-family:var(--display);font-size:4.2rem;line-height:.9;font-weight:700}
+.meta{display:flex;gap:18px;flex-wrap:wrap}
+.meta div{display:grid}
+.meta b{font-family:var(--display);font-size:1.5rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.tiles div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tiles span{color:var(--muted);font-size:.85rem}
+.tiles b{font-family:var(--display);font-size:1.25rem}
+section{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:12px;min-width:0}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label{display:grid;gap:4px;font-size:.8rem;color:var(--muted);font-weight:600}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 10px;min-width:0;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{font:inherit;font-weight:600;border-radius:6px;padding:9px 14px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--surface)}
+button.ghost{background:transparent;color:var(--accent)}
+button.small{padding:5px 10px;font-size:.85rem}
+button:disabled{opacity:.45;cursor:default}
+.seg{display:inline-flex;border:1px solid var(--accent);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent;color:var(--accent);padding:7px 12px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.preview{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;padding:10px 12px;border-radius:6px;background:var(--accent-soft)}
+.preview b{font-family:var(--display);font-size:1.3rem}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.sum div{border:1px solid var(--line);border-radius:6px;padding:6px 8px;display:grid}
+.sum span{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.sum b{font-family:var(--display);font-size:1.45rem;line-height:1.1}
+.pill{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.pill.esr{background:var(--tee-soft);color:var(--ink);border:1px solid var(--tee)}
+.pill.b8{background:var(--accent-soft);color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.note{font-size:.82rem;color:var(--muted);margin:0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+th,td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tr.hl td{background:var(--tee-soft)}
+tr.b8 td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+tr.sub td{font-weight:700;border-top:2px solid var(--ink)}
+td input{width:64px;padding:5px 6px;text-align:center}
+.holes td{text-align:center} .holes th{text-align:center}
+.dots{color:var(--accent);letter-spacing:1px;font-weight:700}
+.res{display:inline-block;min-width:30px;padding:3px 0;border-radius:4px;font-weight:700;text-align:center}
+.k-eagle{background:var(--c-eagle);color:var(--c-on)} .k-birdie{background:var(--c-birdie);color:var(--c-on-light)}
+.k-par{background:var(--c-par);color:var(--c-on-light)} .k-bogey{background:var(--c-bogey);color:var(--c-on-light)}
+.k-double{background:var(--c-double);color:var(--c-on)} .k-triple{background:var(--c-triple);color:var(--c-on)} .k-pick{background:var(--line);color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.78rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.kpis div{border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;gap:2px}
+.kpis span{font-size:.78rem;color:var(--muted)}
+.kpis b{font-family:var(--display);font-size:1.35rem}
+.kpis em{font-style:normal;font-size:.8rem;color:var(--muted)}
+.up{color:var(--accent)} .down{color:var(--warn)}
+svg text{fill:var(--muted);font-size:11px;font-family:var(--body)}
+.chartbox{overflow-x:auto}
+details summary{cursor:pointer;font-weight:600}
+textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px}
+.flag{color:var(--warn);font-size:.78rem;font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="preview" id="status" hidden></div>
+  <header class="head">
+    <div>
+      <div class="eyebrow" id="who"></div>
+      <h1 style="font-size:1.7rem">Golf-Tracker</h1>
+    </div>
+    <div class="meta">
+      <div><span class="eyebrow">HCPI</span><span class="big num" id="hcpi">–</span></div>
+      <div><span class="eyebrow">Low HCPI</span><b class="num" id="low">–</b></div>
+      <div><span class="eyebrow">Soft Cap ab</span><b class="num" id="soft">–</b></div>
+    </div>
+  </header>
+
+  <div class="tiles" id="vorg"></div>
+
+  <section id="secEntry">
+    <div class="row between">
+      <h2>Runde erfassen</h2>
+      <div class="seg" role="group" aria-label="Eingabeart">
+        <button id="mHoles" aria-pressed="true">Loch für Loch</button><button id="mTotal" aria-pressed="false">Nur Gesamtscore</button>
+      </div>
+    </div>
+    <div class="form">
+      <label>Platz / Abschlag<select id="course"></select></label>
+      <label>Datum<input id="date" type="date"></label>
+      <label id="totalBox" hidden>Score (bereinigt, GBE)<input id="score" type="number" inputmode="numeric" min="20" max="160"></label>
+    </div>
+    <div id="holeBox" class="tbl"></div>
+    <p class="note" id="holeNote">Schläge je Loch eintragen. 0 = Loch gestrichen (zählt als Netto-Doppelbogey). Punkte nach Stableford mit deiner Spielvorgabe.</p>
+    <div id="summary" class="sum"></div>
+    <div class="preview" id="preview"></div>
+    <div class="row">
+      <button id="add">Runde speichern</button>
+      <button class="ghost" id="undo">Letzte Runde entfernen</button>
+      <span class="note" id="addMsg"></span>
+    </div>
+  </section>
+
+  <section id="secDev">
+    <h2>Entwicklung</h2>
+    <div class="kpis" id="kpis"></div>
+    <div class="legend" id="legend"></div>
+    <div class="chartbox" id="distChart"></div>
+    <div class="tbl"><table id="roundsTbl"></table></div>
+  </section>
+
+  <section id="secScen">
+    <div class="row between">
+      <h2>Was muss ich spielen?</h2>
+      <label style="grid-auto-flow:column;align-items:center;gap:8px">Über
+        <select id="nRounds" style="width:auto"><option>5</option><option selected>10</option><option>15</option><option>20</option></select> Runden</label>
+    </div>
+    <p class="note">Ø-Brutto (bereinigt), den deine Runden erreichen müssen, damit der HCPI nach der gewählten Rundenzahl beim Ziel landet. Berechnet aus deinem Stammblatt inkl. herausfallender Runden und ESR.</p>
+    <div class="tbl"><table id="scen"></table></div>
+  </section>
+
+  <section id="secHist">
+    <h2>HCPI-Verlauf</h2>
+    <div class="chartbox" id="chart"></div>
+  </section>
+
+  <section id="secRec">
+    <div class="row between">
+      <h2>Stammblatt · letzte 20</h2>
+      <span><span class="pill b8">Best 8</span> <span class="pill esr">ESR</span></span>
+    </div>
+    <div class="tbl"><table id="rec"></table></div>
+    <p class="note" id="recNote"></p>
+  </section>
+
+  <section id="secCourses">
+    <div class="row between">
+      <h2>Plätze</h2>
+      <button class="ghost small" id="newCourse">Platz anlegen</button>
+    </div>
+    <div class="tbl"><table id="courseTbl"></table></div>
+    <div id="courseForm" hidden style="display:grid;gap:10px">
+      <h3 id="cfTitle">Platz anlegen</h3>
+      <div class="form">
+        <label>Club<input id="cfClub" placeholder="z. B. Golfclub Wannsee"></label>
+        <label>Platz<input id="cfName" placeholder="z. B. Platz Wannsee"></label>
+        <label>Abschlag<input id="cfTee" placeholder="z. B. Gelb"></label>
+        <label>Löcher<select id="cfHoles"><option>18</option><option>9</option></select></label>
+        <label>Course Rating<input id="cfCR" inputmode="decimal" autocomplete="off"></label>
+        <label>Slope<input id="cfS" inputmode="numeric" autocomplete="off"></label>
+      </div>
+      <div class="tbl" id="cfGrid"></div>
+      <p class="note">CR und Slope stehen auf der Scorekarte oder in der Vorgabentabelle des Clubs. Hcp = Lochvorgabe (1 = schwerstes Loch); bei 9-Loch-Plätzen 1 bis 9.</p>
+      <div class="row">
+        <button id="cfSave">Platz speichern</button>
+        <button class="ghost" id="cfCancel">Abbrechen</button>
+        <button class="ghost" id="cfDelete" hidden>Platz löschen</button>
+        <span class="note" id="cfMsg"></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <details>
+      <summary>Sichern und wiederherstellen</summary>
+      <div style="display:grid;gap:10px;margin-top:10px">
+        <p class="note" id="storeNote">Alle Daten liegen nur auf diesem Gerät. Öffne die App immer über das Symbol auf dem Home-Bildschirm und lade dir regelmäßig eine Sicherung herunter, z. B. nach jedem Turnier. Die Sicherung enthält Stammblatt, Runden und eigene Plätze.</p>
+        <textarea id="backup" aria-label="Sicherungsdaten"></textarea>
+        <div class="row">
+          <button class="ghost small" id="dl">Sicherung herunterladen</button>
+          <label class="ghost small" style="display:inline-flex;cursor:pointer;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:5px 10px;font-size:.85rem">Sicherung laden<input type="file" id="ul" accept=".json,application/json" hidden></label>
+          <button class="ghost small" id="copy">Text kopieren</button>
+          <button class="ghost small" id="restore">Aus Textfeld laden</button>
+          <span class="note" id="msg"></span>
+        </div>
+      </div>
+    </details>
+  </section>
+</div>
+
+<script>
+const SH="Berliner GC Stolper Heide", BS="Golf Club Bad Saarow";
+const WP=[5,4,4,3,5,3,5,3,4,4,5,3,4,3,4,5,4,4], WSI=[9,13,5,11,17,15,1,3,7,2,12,18,8,16,10,14,4,6];
+const OP=[4,4,3,5,4,4,4,3,5,4,4,5,4,3,4,4,3,5], OSI=[5,3,17,7,11,13,1,9,15,2,14,18,4,12,16,6,8,10];
+const FP=[5,4,3,4,3,5,4,4,4,5,5,4,3,4,4,4,3,4], FSI=[11,5,17,9,13,7,1,15,3,6,2,14,8,12,10,16,18,4];
+const PRESETS={
+  west18:{club:SH,name:"Westplatz",tee:"Gelb",holes:18,cr:71.7,s:126,par:WP,si:WSI,check:"Lochdaten aus öffentlicher Quelle"},
+  westW:{club:SH,name:"Westplatz",tee:"Weiß",holes:18,cr:73.1,s:127,par:WP,si:WSI,check:"Lochdaten aus öffentlicher Quelle"},
+  westS:{club:SH,name:"Westplatz",tee:"Schwarz",holes:18,cr:74.8,s:128,par:WP,si:WSI,check:"Lochdaten aus öffentlicher Quelle"},
+  ost18:{club:SH,name:"Ostplatz",tee:"Gelb",holes:18,cr:72.2,s:129,par:OP,si:OSI,check:"Hcp-Reihenfolge Loch 10–18 aus älterer Quelle"},
+  ost9:{club:SH,name:"Ostplatz 1–9",tee:"Gelb",holes:9,cr:36.1,s:131,par:OP.slice(0,9),si:[3,2,9,4,6,7,1,5,8]},
+  west9:{club:SH,name:"Westplatz 1–9",tee:"Gelb",holes:9,cr:35.9,s:126,par:WP.slice(0,9),si:[5,8,3,6,9,7,1,2,4],check:"CR/Slope geschätzt"},
+  faldoG:{club:BS,name:"Faldo Course",tee:"Gelb",holes:18,cr:73.4,s:139,par:FP,si:FSI,check:"Lochdaten aus öffentlicher Quelle"},
+  faldoW:{club:BS,name:"Faldo Course",tee:"Weiß",holes:18,cr:75.2,s:150,par:FP,si:FSI,check:"CR/Slope geschätzt"}
+};
+const SEED={"rec":[{"d":"17.10.26","l":"Faldo Weiß · 73","sd":-1.7,"adj":-2,"esr":-2},{"d":"16.10.26","l":"After Work 9 L · 37","sd":6.7,"adj":-2},{"d":"19.09.26","l":"End of Summer · 87","sd":13.7,"adj":-2},{"d":"12.09.26","l":"Jugendcup 9 L · 37","sd":7.5,"adj":-2},{"d":"30.08.26","l":"Clubmeisterschaft · 88","sd":13.7,"adj":-2},{"d":"29.08.26","l":"Clubmeisterschaft · 81","sd":8.3,"adj":-2},{"d":"20.08.26","l":"GVBB Gatow · 88","sd":15,"adj":-2},{"d":"19.08.26","l":"GVBB Gatow · 84","sd":11.4,"adj":-2},{"d":"18.08.26","l":"GVBB Gatow · 81","sd":8.7,"adj":-2},{"d":"05.08.26","l":"Offener Mittwoch · 92","sd":17.3,"adj":-2},{"d":"21.06.26","l":"Monatspreis S · 82","sd":9.2,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9.2,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":9.4,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":11,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":12.5,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":14,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":15.5,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":16,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":17,"adj":-2},{"d":"","l":"Seite 2 (geschätzt)","sd":18,"adj":0}],"hist":[{"l":"Start","h":8.5},{"l":"17.10.26","h":5.1}],"low":5.1,"undo":[]};
+const CFG={"id": "simon", "who": "Simon Steiner · Berliner GC Stolper Heide", "fav": ["westW", "westS", "ost18", "faldoW"], "scen": ["westW", "westS", "ost18", "faldoW"], "goal": null, "typical": 12.0, "typicalText": "Spielt Simon auf seinem bisherigen Niveau (Ø SD ≈ 12, rund 85 vom Weiß West),", "recNote": "Ausgangswerte aus dem Scoring Record (Seite 1 exakt, Seite 2 geschätzt). Die Faldo-Runde (73 vom Weiß) ist mit dem geschätzten Rating 75,2/150 eingerechnet; bitte mit golf.de abgleichen.", "def": "westW"};
+const $=id=>document.getElementById(id);
+const r1=x=>Math.round(x*10)/10;
+const fmt=x=>(x<0?"−":"")+Math.abs(x).toFixed(1).replace(".",",");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LKEY="hcpi-tracker-"+CFG.id+"-v3";
+let S=null, ROUNDS=[], CUSTOM={}, db=null, stateRef=null, mode="holes", editId=null;
+let q=Promise.resolve();
+const enqueue=fn=>{q=q.then(fn).catch(e=>showStatus(e&&e.code==="quota_exceeded"?"Speicher voll. Bitte Sicherung kopieren.":"Speichern hat nicht geklappt. Lade die Seite neu und prüf den letzten Eintrag."));return q};
+function showStatus(t){$("status").hidden=!t;$("status").textContent=t||""}
+function cacheLocal(){try{localStorage.setItem(LKEY,JSON.stringify({S,ROUNDS,CUSTOM}))}catch(e){}}
+
+/* ---------- Plätze ---------- */
+function courses(){return {...PRESETS,...CUSTOM}}
+function cLabel(c){return `${c.name} ${c.tee} · ${c.holes} L`}
+function parSum(c){return c.par.reduce((a,b)=>a+b,0)}
+function courseHcp(c,h){const v=c.holes===9?h/2*c.s/113+c.cr-parSum(c):h*c.s/113+c.cr-parSum(c);return Math.round(v)}
+function strokesFor(ph,si,n){if(ph>=0)return Math.floor(ph/n)+(si<=ph%n?1:0);const k=-ph;return -(Math.floor(k/n)+(si>n-(k%n)?1:0))}
+
+/* ---------- WHS ---------- */
+function rawIndex(rec){const v=rec.slice(0,20).map(o=>o.sd+o.adj).sort((a,b)=>a-b);const n=v.length;if(!n)return 54;
+  const cnt=n>=20?8:n>=19?7:n>=17?6:n>=15?5:n>=12?4:n>=9?3:n>=7?2:1;return v.slice(0,cnt).reduce((a,b)=>a+b,0)/cnt}
+function capped(raw,low){let h=raw;if(h-low>3)h=low+3+(h-low-3)/2;if(h>low+5)h=low+5;return r1(h)}
+function hcpiOf(rec,low){return capped(rawIndex(rec),low)}
+function bestIdx(rec){return rec.slice(0,20).map((o,i)=>[o.sd+o.adj,i]).sort((a,b)=>a[0]-b[0]).slice(0,8).map(x=>x[1])}
+function sdFor(c,score,h){const base=(score-c.cr)*113/c.s;return r1(c.holes===9?base+0.52*h+1.2:base)}
+function esrFor(h,sd){const d=h-sd;return d>=10?-2:d>=7?-1:0}
+function addTo(st,entry){const h=hcpiOf(st.rec,st.low);const e=esrFor(h,entry.sd);
+  const rec=[{...entry,adj:0,esr:e},...st.rec.map(o=>({...o}))].slice(0,40);if(e)for(let i=0;i<Math.min(20,rec.length);i++)rec[i].adj+=e;
+  const nh=hcpiOf(rec,st.low);return {rec,low:Math.min(st.low,nh),h:nh,esr:e}}
+function simulate(n,X){let st={rec:S.rec,low:S.low};for(let i=0;i<n;i++)st=addTo(st,{sd:X});return hcpiOf(st.rec,st.low)}
+function solve(n,target){let lo=-10,hi=60;for(let i=0;i<40;i++){const m=(lo+hi)/2;if(simulate(n,m)<=target)lo=m;else hi=m}return lo}
+
+/* ---------- Runde auswerten ---------- */
+const CLS=[["eagle","Eagle+"],["birdie","Birdie"],["par","Par"],["bogey","Bogey"],["double","Doppelbogey"],["triple","Triple+"],["pick","Gestrichen"]];
+function cls(g,par,pick){if(pick)return "pick";const d=g-par;return d<=-2?"eagle":d===-1?"birdie":d===0?"par":d===1?"bogey":d===2?"double":"triple"}
+function evalRound(c,gross,ph){const n=c.holes;const holes=[];const t={gross:0,adj:0,net:0,pts:0,ptsB:0,played:0,pick:0};
+  const dist=Object.fromEntries(CLS.map(x=>[x[0],0]));const byPar={};
+  for(let i=0;i<n;i++){const par=c.par[i],si=c.si[i],st=strokesFor(ph,si,n);const raw=gross[i];
+    if(raw===""||raw==null||isNaN(raw)){holes.push({par,si,st,empty:true});continue}
+    const pick=+raw===0;const ndb=par+2+st;const g=pick?ndb:+raw;const adj=Math.min(g,ndb);
+    const pts=pick?0:Math.max(0,par+st-g+2),ptsB=pick?0:Math.max(0,par-g+2);const k=cls(g,par,pick);
+    holes.push({par,si,st,g:pick?null:g,pick,adj,net:g-st,pts,ptsB,k});
+    t.gross+=g;t.adj+=adj;t.net+=g-st;t.pts+=pts;t.ptsB+=ptsB;t.played++;if(pick)t.pick++;dist[k]++;
+    const bp=byPar[par]||(byPar[par]={over:0,n:0});bp.over+=g-par;bp.n++}
+  return {holes,t,dist,byPar,complete:t.played===n}}
+
+/* ---------- Speichern ---------- */
+function writeState(){cacheLocal();if(!stateRef)return;const snap=JSON.parse(JSON.stringify({rec:S.rec,hist:S.hist,low:S.low,undo:(S.undo||[]).slice(-5)}));enqueue(()=>stateRef.set(snap))}
+function writeRound(r){cacheLocal();if(!db)return;enqueue(()=>db.collection("rounds").doc(r.id).set(r))}
+function dropRound(id){cacheLocal();if(!db||!id)return;enqueue(()=>db.collection("rounds").doc(id).delete())}
+function writeCourse(id,c){cacheLocal();if(!db)return;enqueue(()=>db.collection("courses").doc(id).set(c))}
+function dropCourse(id){cacheLocal();if(!db)return;enqueue(()=>db.collection("courses").doc(id).delete())}
+
+/* ---------- Erfassen ---------- */
+function curCourse(){return courses()[$("course").value]}
+function fillCourseSelect(){const cs=courses(),sel=$("course"),keep=sel.value;const groups={};
+  Object.entries(cs).forEach(([id,c])=>{(groups[c.club]=groups[c.club]||[]).push([id,c])});
+  const order=Object.keys(groups).sort((a,b)=>(a===SH?-1:b===SH?1:a.localeCompare(b)));
+  sel.innerHTML=order.map(g=>`<optgroup label="${esc(g)}">${groups[g].sort((a,b)=>CFG.fav.indexOf(a[0])<0?1:CFG.fav.indexOf(b[0])<0?-1:CFG.fav.indexOf(a[0])-CFG.fav.indexOf(b[0])).map(([id,c])=>`<option value="${id}">${esc(cLabel(c))}</option>`).join("")}</optgroup>`).join("");
+  sel.value=cs[keep]?keep:(cs[CFG.def]?CFG.def:Object.keys(cs)[0])}
+function buildHoleGrid(){const c=curCourse();if(!c){$("holeBox").innerHTML="";return}
+  const h=S?hcpiOf(S.rec,S.low):0;const ph=courseHcp(c,h);
+  const rows=c.par.map((p,i)=>`<tr><td><b>${i+1}</b></td><td>${p}</td><td>${c.si[i]}</td><td class="dots" id="st${i}"></td>
+    <td><input id="g${i}" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="Schläge Loch ${i+1}" autocomplete="off"></td><td id="n${i}"></td><td id="p${i}"></td></tr>`);
+  const mid=c.holes===18?`<tr class="sub"><td>Out</td><td>${c.par.slice(0,9).reduce((a,b)=>a+b,0)}</td><td></td><td></td><td id="sgO"></td><td id="snO"></td><td id="spO"></td></tr>`:"";
+  $("holeBox").innerHTML=`<table class="holes"><tr><th>Loch</th><th>Par</th><th>Hcp</th><th>Vorg.</th><th>Schläge</th><th>Netto</th><th>Pkt</th></tr>
+    ${rows.slice(0,9).join("")}${mid}${rows.slice(9).join("")}
+    <tr class="sub"><td>${c.holes===18?"Gesamt":"9 L"}</td><td>${parSum(c)}</td><td></td><td class="num" id="phCell">${ph}</td><td id="sgT"></td><td id="snT"></td><td id="spT"></td></tr></table>`;
+  c.par.forEach((p,i)=>{const el=$("g"+i);el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"").slice(0,2);updateLive();
+    if(el.value.length===2||(el.value.length===1&&+el.value>1)){const nx=$("g"+(i+1));if(nx)nx.focus()}})});
+  updateLive()}
+function readGross(){const c=curCourse();return c.par.map((p,i)=>{const v=$("g"+i)?.value;return v===""||v==null?"":+v})}
+function updateLive(){if(!S||!S.rec.length)return;const c=curCourse();if(!c)return;const h=hcpiOf(S.rec,S.low);const ph=courseHcp(c,h);
+  let adjTotal=null,info="";
+  if(mode==="holes"){const ev=evalRound(c,readGross(),ph);
+    ev.holes.forEach((x,i)=>{$("st"+i).textContent=x.st>0?"•".repeat(x.st):x.st<0?"+"+(-x.st):"";
+      $("n"+i).innerHTML=x.empty?"":x.pick?'<span class="res k-pick">–</span>':`<span class="res k-${x.k}">${x.g}</span>`;$("p"+i).textContent=x.empty?"":x.pts});
+    const part=(a,b)=>ev.holes.slice(a,b).filter(x=>!x.empty);
+    const tot=arr=>[arr.reduce((s,x)=>s+(x.pick?x.adj:x.g),0),arr.reduce((s,x)=>s+x.net,0),arr.reduce((s,x)=>s+x.pts,0)];
+    if(c.holes===18){const [g,n,p]=tot(part(0,9));$("sgO").textContent=g||"";$("snO").textContent=n||"";$("spO").textContent=p||""}
+    const [g,n,p]=tot(part(0,c.holes));$("sgT").textContent=g||"";$("snT").textContent=n||"";$("spT").textContent=p||"";$("phCell").textContent=ph;
+    const t=ev.t;
+    $("summary").innerHTML=t.played?`<div><span>Brutto</span><b>${t.gross}${t.pick?"*":""}</b></div><div><span>Netto</span><b>${t.gross-ph}</b></div>
+      <div><span>Pkt netto</span><b>${t.pts}</b></div><div><span>Pkt brutto</span><b>${t.ptsB}</b></div><div><span>GBE</span><b>${t.adj}</b></div>
+      <div><span>Löcher</span><b>${t.played}/${c.holes}</b></div>`:"";
+    if(ev.complete)adjTotal=t.adj;else info=`Noch ${c.holes-t.played} Loch offen. Vorgabe ${ph}.`;
+  }else{const sc=+$("score").value;if(sc>0)adjTotal=sc;else info=`Gesamtscore eintragen. Vorgabe ${ph}.`;$("summary").innerHTML=""}
+  if(adjTotal!=null){const sd=sdFor(c,adjTotal,h);const t=addTo(S,{sd});const diff=r1(t.h-h);
+    $("preview").innerHTML=`<span>Score Differential <b>${fmt(sd)}</b></span><span>Neuer HCPI <b>${fmt(t.h)}</b></span>
+      <span style="color:${diff>0?"var(--warn)":"var(--accent)"};font-weight:700">${diff>0?"+":diff<0?"":"±"}${fmt(diff)}</span>${t.esr?`<span class="pill esr">ESR ${fmt(t.esr)}</span>`:""}`;$("add").disabled=false}
+  else{$("preview").textContent=info;$("add").disabled=true}}
+function saveRound(){const c=curCourse(),id0=$("course").value;const h=hcpiOf(S.rec,S.low),ph=courseHcp(c,h);
+  let adjTotal,ev=null;if(mode==="holes"){ev=evalRound(c,readGross(),ph);if(!ev.complete)return;adjTotal=ev.t.adj}else{adjTotal=+$("score").value;if(!(adjTotal>0))return}
+  const sd=sdFor(c,adjTotal,h);const dIso=$("date").value||new Date().toISOString().slice(0,10);const d=dIso.split("-").reverse().join(".").replace(/\.20(\d\d)$/,".$1");
+  const rid="r"+Date.now().toString(36);const prev={rec:S.rec,hist:S.hist,low:S.low,rid};
+  const t=addTo(S,{d,l:`${c.name} ${c.tee} · ${ev?ev.t.gross+(ev.t.pick?"*":""):adjTotal}`,sd,rid});
+  S.undo=[...(S.undo||[]).slice(-4),prev];S.rec=t.rec;S.low=t.low;S.hist=[...S.hist,{l:d,h:t.h}];
+  const r={id:rid,date:dIso,courseId:id0,course:cLabel(c),club:c.club,holes:c.holes,par:c.par,si:c.si,ph,hcpi:h,sd,esr:t.esr,hcpiAfter:t.h,adj:adjTotal,mode};
+  if(ev){r.gross=readGross();r.t=ev.t;r.dist=ev.dist;r.byPar=ev.byPar}
+  ROUNDS=[...ROUNDS.filter(x=>x.id!==rid),r];writeRound(r);writeState();
+  c.par.forEach((p,i)=>{if($("g"+i))$("g"+i).value=""});$("score").value="";$("addMsg").textContent="Gespeichert: SD "+fmt(sd)+", HCPI "+fmt(t.h);render()}
+function undoLast(){if(!S.undo||!S.undo.length)return;const p=S.undo.pop();S.rec=p.rec;S.hist=p.hist;S.low=p.low;
+  if(p.rid){ROUNDS=ROUNDS.filter(r=>r.id!==p.rid);dropRound(p.rid)}writeState();$("addMsg").textContent="Letzte Runde entfernt";render()}
+
+/* ---------- Entwicklung ---------- */
+function renderDev(){const rs=ROUNDS.filter(r=>r.dist).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.id<b.id?-1:1);
+  $("legend").innerHTML=CLS.map(([k,l])=>`<span><i class="k-${k}"></i>${l}</span>`).join("");
+  if(!rs.length){$("kpis").innerHTML='<p class="note">Sobald du eine Runde Loch für Loch erfasst, siehst du hier Birdies, Pars, Bogeys und Doppelbogeys je Runde und wie sie sich entwickeln.</p>';$("distChart").innerHTML="";$("roundsTbl").innerHTML="";return}
+  const per18=(arr,f)=>{let s=0,h=0;arr.forEach(r=>{s+=f(r);h+=r.holes});return h?s*18/h:0};
+  const parAvg=(arr,p)=>{let o=0,n=0;arr.forEach(r=>{const b=r.byPar&&r.byPar[p];if(b){o+=b.over;n+=b.n}});return n?o/n:null};
+  const last=rs.slice(-5);
+  const K=[["Pars oder besser je 18 L",r=>r.dist.eagle+r.dist.birdie+r.dist.par,1],["Bogeys je 18 L",r=>r.dist.bogey,0],["Doppelbogey+ je 18 L",r=>r.dist.double+r.dist.triple+r.dist.pick,-1],["Stableford netto je 18 L",r=>r.t.pts,1]];
+  let html=K.map(([l,f,dir])=>{const a=per18(rs,f),b=per18(last,f),d=b-a;const cl=rs.length<6||Math.abs(d)<0.05||!dir?"":(d*dir>0?"up":"down");
+    return `<div><span>${l}</span><b>${b.toFixed(1).replace(".",",")}</b><em>letzte 5 · gesamt ${a.toFixed(1).replace(".",",")} <span class="${cl}">${rs.length<6?"":(d>0?"▲":d<0?"▼":"")}</span></em></div>`}).join("");
+  html+=[3,4,5].map(p=>{const a=parAvg(rs,p),b=parAvg(last,p);if(a==null)return "";const d=b-a,cl=rs.length<6||Math.abs(d)<0.02?"":(d<0?"up":"down");
+    return `<div><span>Ø über Par auf Par ${p}</span><b>+${b.toFixed(2).replace(".",",")}</b><em>letzte 5 · gesamt +${a.toFixed(2).replace(".",",")} <span class="${cl}">${rs.length<6?"":(d<0?"▲":d>0?"▼":"")}</span></em></div>`}).join("");
+  $("kpis").innerHTML=html;
+  // gestapelte Balken je Runde (Anteile)
+  const R=rs.slice(-15),bw=30,gap=12,H=150,pl=30,W=Math.max(300,pl+R.length*(bw+gap)+10),ys=v=>10+(1-v)*(H-30);
+  let g="";[0,.5,1].forEach(v=>{g+=`<line x1="${pl}" x2="${W}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${pl-5}" y="${ys(v)+4}" text-anchor="end">${v*100}%</text>`});
+  R.forEach((r,i)=>{let acc=0;const x=pl+6+i*(bw+gap);CLS.forEach(([k])=>{const f=r.dist[k]/r.holes;if(!f)return;
+    g+=`<rect x="${x}" y="${ys(acc+f)}" width="${bw}" height="${ys(acc)-ys(acc+f)}" fill="var(--c-${k==="pick"?"triple":k})" ${k==="pick"?'opacity=".5"':""}/>`;acc+=f});
+    g+=`<text x="${x+bw/2}" y="${H-4}" text-anchor="middle">${r.date.slice(8,10)}.${r.date.slice(5,7)}.</text>`});
+  $("distChart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Ergebnisverteilung je Runde">${g}</svg>`;
+  $("roundsTbl").innerHTML=`<tr><th>Datum</th><th>Platz</th><th>Brutto</th><th>Netto</th><th>Pkt</th><th>E+</th><th>Bi</th><th>Par</th><th>Bo</th><th>DB</th><th>TB+</th><th>SD</th></tr>`+
+    rs.slice().reverse().map(r=>`<tr><td>${r.date.slice(8,10)}.${r.date.slice(5,7)}.${r.date.slice(2,4)}</td><td>${esc(r.course)}</td><td>${r.t.gross}${r.t.pick?"*":""}</td><td>${r.t.gross-r.ph}</td><td>${r.t.pts}</td>
+      <td>${r.dist.eagle||""}</td><td>${r.dist.birdie||""}</td><td>${r.dist.par||""}</td><td>${r.dist.bogey||""}</td><td>${r.dist.double||""}</td><td>${(r.dist.triple+r.dist.pick)||""}</td><td>${fmt(r.sd)}</td></tr>`).join("")}
+
+/* ---------- Plätze verwalten ---------- */
+function renderCourses(){const cs=courses();
+  $("courseTbl").innerHTML=`<tr><th>Platz</th><th>Club</th><th>CR / Slope</th><th>Par</th><th></th></tr>`+Object.entries(cs).map(([id,c])=>
+    `<tr><td>${esc(cLabel(c))}${c.check?`<br><span class="flag">${esc(c.check)}, bitte prüfen</span>`:""}</td><td>${esc(c.club)}</td><td>${String(c.cr).replace(".",",")} / ${c.s}</td><td>${parSum(c)}</td>
+     <td><button class="ghost small" data-edit="${id}">Bearbeiten</button></td></tr>`).join("");
+  document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>openCourse(b.dataset.edit)))}
+function cfGrid(n,c){const par=c?c.par:Array(n).fill(4),si=c?c.si:Array.from({length:n},(_,i)=>i+1);
+  $("cfGrid").innerHTML=`<table class="holes"><tr><th>Loch</th>${par.map((_,i)=>`<th>${i+1}</th>`).join("")}</tr>
+   <tr><td>Par</td>${par.map((p,i)=>`<td><input id="cfP${i}" inputmode="numeric" value="${p}" style="width:40px" aria-label="Par Loch ${i+1}"></td>`).join("")}</tr>
+   <tr><td>Hcp</td>${si.map((s,i)=>`<td><input id="cfI${i}" inputmode="numeric" value="${s}" style="width:40px" aria-label="Hcp Loch ${i+1}"></td>`).join("")}</tr></table>`}
+function openCourse(id){editId=id;const c=id?courses()[id]:null;$("courseForm").hidden=false;$("cfTitle").textContent=c?"Platz bearbeiten":"Platz anlegen";
+  $("cfClub").value=c?c.club:"";$("cfName").value=c?c.name:"";$("cfTee").value=c?c.tee:"";$("cfHoles").value=c?String(c.holes):"18";
+  $("cfCR").value=c?c.cr:"";$("cfS").value=c?c.s:"";cfGrid(c?c.holes:18,c);$("cfMsg").textContent="";
+  $("cfDelete").hidden=!(id&&CUSTOM[id]);$("cfDelete").textContent=id&&PRESETS[id]?"Auf Standard zurücksetzen":"Platz löschen";$("cfDelete").dataset.armed="";
+  $("courseForm").scrollIntoView?.({behavior:"smooth",block:"start"})}
+function saveCourse(){const n=+$("cfHoles").value;const par=[],si=[];
+  for(let i=0;i<n;i++){par.push(+$("cfP"+i).value);si.push(+$("cfI"+i).value)}
+  const c={club:$("cfClub").value.trim(),name:$("cfName").value.trim(),tee:$("cfTee").value.trim(),holes:n,cr:parseFloat(String($("cfCR").value).replace(",",".")),s:+$("cfS").value,par,si};
+  const err=!c.club||!c.name||!c.tee?"Club, Platz und Abschlag ausfüllen.":!(c.cr>20&&c.cr<90)?"Course Rating prüfen.":!(c.s>=55&&c.s<=155)?"Slope muss zwischen 55 und 155 liegen.":
+    par.some(p=>!(p>=3&&p<=6))?"Par je Loch muss zwischen 3 und 6 liegen.":[...si].sort((a,b)=>a-b).some((v,i)=>v!==i+1)?`Hcp muss jede Zahl von 1 bis ${n} genau einmal enthalten.`:"";
+  if(err){$("cfMsg").textContent=err;return}
+  const id=editId||("c"+Date.now().toString(36));CUSTOM={...CUSTOM,[id]:c};writeCourse(id,c);
+  $("courseForm").hidden=true;fillCourseSelect();$("course").value=id;buildHoleGrid();render()}
+
+/* ---------- Gesamtansicht ---------- */
+function render(){
+  $("who").textContent=CFG.who;$("recNote").textContent=CFG.recNote;
+  const on=!!(S&&S.rec&&S.rec.length);["secEntry","secScen","secHist","secRec"].forEach(id=>$(id).style.opacity=on?"":".45");$("undo").disabled=!on||!(S.undo&&S.undo.length);
+  renderCourses();
+  if(!on){["hcpi","low","soft"].forEach(id=>$(id).textContent="–");$("vorg").innerHTML="";$("preview").textContent="Noch kein Stammblatt hinterlegt. Lade unten eine Sicherung.";$("add").disabled=true;$("scen").innerHTML="";$("rec").innerHTML="";$("chart").innerHTML="";renderDev();return}
+  const h=hcpiOf(S.rec,S.low),cs=courses();
+  $("hcpi").textContent=fmt(h);$("low").textContent=fmt(S.low);$("soft").textContent=fmt(r1(S.low+3));
+  $("vorg").innerHTML=CFG.fav.filter(k=>cs[k]).map(k=>`<div><span>Vorgabe ${esc(cs[k].name)} ${esc(cs[k].tee)}${cs[k].holes===9?" 9 L":""}</span><b>${courseHcp(cs[k],h)}</b></div>`).join("");
+  if($("phCell"))$("phCell").textContent=courseHcp(curCourse(),h);
+  updateLive();
+  // Szenarien
+  const n=+$("nRounds").value,fl=Math.floor(h-0.05),targets=[r1(h),fl,fl-1,fl-2,fl-3,fl-4],sc=CFG.scen.filter(k=>cs[k]);
+  $("scen").innerHTML=`<tr><th>Ziel-HCPI</th><th>Ø SD</th>${sc.map(k=>`<th>${esc(cs[k].name)}<br>${esc(cs[k].tee)} ${cs[k].holes} L</th>`).join("")}</tr>`+targets.map(t=>{const X=solve(n,t),cur=Math.abs(t-r1(h))<0.05;
+    return `<tr class="${cur?"hl":""}"><td><b>${fmt(t)}</b>${cur?" halten":""}</td><td>${fmt(X)}</td>${sc.map(k=>{const c=cs[k];const v=c.holes===9?c.cr+(X-(0.52*h+1.2))*c.s/113:c.cr+X*c.s/113;return `<td><b>${fmt(v)}</b></td>`}).join("")}</tr>`}).join("")+
+    `<tr><td colspan="${2+sc.length}" style="text-align:left;white-space:normal" class="note">${CFG.typicalText} landest du nach ${n} Runden bei <b>${fmt(simulate(n,CFG.typical))}</b>.</td></tr>`;
+  // Stammblatt
+  const best=bestIdx(S.rec);
+  $("rec").innerHTML=`<tr><th>Runde</th><th>Datum</th><th>SD</th><th>gewertet</th></tr>`+S.rec.slice(0,20).map((o,i)=>`<tr class="${best.includes(i)?"b8":""}"><td>${esc(o.l)} ${best.includes(i)?'<span class="pill b8">8</span>':""} ${o.esr?`<span class="pill esr">ESR ${fmt(o.esr)}</span>`:""}</td>
+    <td>${esc(o.d)||"–"}</td><td><input inputmode="decimal" id="sd${i}" data-i="${i}" value="${o.sd}" aria-label="SD ${esc(o.l)}"></td><td><b>${fmt(r1(o.sd+o.adj))}</b></td></tr>`).join("");
+  document.querySelectorAll("#rec input").forEach(inp=>inp.addEventListener("change",e=>{const i=+e.target.dataset.i,v=parseFloat(String(e.target.value).replace(",","."));if(!isNaN(v)){S.rec[i].sd=v;writeState();render()}}));
+  // Verlauf
+  const HH=S.hist,W=Math.max(320,HH.length*46),ht=170,p={l:34,r:14,t:14,b:26},vals=HH.map(x=>x.h);
+  const mn=Math.floor(Math.min(...vals,CFG.goal??Math.min(...vals))-0.5),mx=Math.ceil(Math.max(...vals)+0.5);
+  const xs=i=>p.l+(HH.length<2?0:i*(W-p.l-p.r)/(HH.length-1)),ys=v=>p.t+(mx-v)*(ht-p.t-p.b)/(mx-mn);
+  let g="";for(let v=mn;v<=mx;v++){if((v-mn)%Math.max(1,Math.ceil((mx-mn)/5)))continue;g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${p.l-6}" y="${ys(v)+4}" text-anchor="end">${v}</text>`}
+  if(CFG.goal!=null)g+=`<line x1="${p.l}" x2="${W-p.r}" y1="${ys(CFG.goal)}" y2="${ys(CFG.goal)}" stroke="var(--tee)" stroke-dasharray="4 4"/><text x="${W-p.r}" y="${ys(CFG.goal)-5}" text-anchor="end">Ziel ${CFG.goal}</text>`;
+  g+=`<path d="${HH.map((x,i)=>`${i?"L":"M"}${xs(i)},${ys(x.h)}`).join("")}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`+HH.map((x,i)=>`<circle cx="${xs(i)}" cy="${ys(x.h)}" r="${i===HH.length-1?5:3}" fill="var(--accent)"/>`).join("");
+  const last=HH[HH.length-1];g+=`<text x="${xs(HH.length-1)}" y="${ys(last.h)-10}" text-anchor="${HH.length>1?"end":"start"}" style="fill:var(--ink);font-weight:700">${fmt(last.h)}</text>`;
+  $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${ht}" width="${W}" height="${ht}" role="img" aria-label="HCPI-Verlauf">${g}</svg>`+(HH.length<2?'<p class="note">Sobald du Runden speicherst, entsteht hier deine Kurve.</p>':"");
+  if(document.activeElement!==$("backup"))$("backup").value=JSON.stringify(fullBackup());
+  renderDev()}
+
+/* ---------- Ereignisse ---------- */
+$("date").value=new Date().toISOString().slice(0,10);
+$("course").addEventListener("change",buildHoleGrid);
+$("score").addEventListener("input",updateLive);$("nRounds").addEventListener("change",render);
+function setMode(m){mode=m;$("mHoles").setAttribute("aria-pressed",m==="holes");$("mTotal").setAttribute("aria-pressed",m==="total");
+  $("holeBox").hidden=$("holeNote").hidden=m!=="holes";$("totalBox").hidden=m!=="total";$("summary").innerHTML="";updateLive()}
+$("mHoles").addEventListener("click",()=>setMode("holes"));$("mTotal").addEventListener("click",()=>setMode("total"));
+$("add").addEventListener("click",saveRound);$("undo").addEventListener("click",undoLast);
+$("newCourse").addEventListener("click",()=>openCourse(null));$("cfCancel").addEventListener("click",()=>{$("courseForm").hidden=true});
+$("cfHoles").addEventListener("change",()=>cfGrid(+$("cfHoles").value,null));$("cfSave").addEventListener("click",saveCourse);
+$("cfDelete").addEventListener("click",e=>{const b=e.target;if(!b.dataset.armed){b.dataset.armed="1";b.textContent="Wirklich?";return}
+  const n={...CUSTOM};delete n[editId];CUSTOM=n;dropCourse(editId);$("courseForm").hidden=true;fillCourseSelect();buildHoleGrid();render()});
+$("copy").addEventListener("click",()=>{const t=$("backup");if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>$("msg").textContent="Kopiert",()=>{t.select();$("msg").textContent="Text markiert, bitte kopieren"});else t.select()});
+function fullBackup(){return {app:"golf-tracker",v:3,S:{rec:S.rec,hist:S.hist,low:S.low},ROUNDS,CUSTOM}}
+function applyBackup(txt){try{const o=JSON.parse(txt);if(o.S&&o.S.rec){S={...o.S,undo:[]};ROUNDS=o.ROUNDS||[];CUSTOM=o.CUSTOM||{}}else if(o.rec){S={...o,undo:[]}}else throw 0;
+  cacheLocal();fillCourseSelect();buildHoleGrid();render();$("msg").textContent="Sicherung geladen"}catch(e){$("msg").textContent="Das ist keine gültige Sicherung"}}
+$("restore").addEventListener("click",()=>applyBackup($("backup").value));
+$("dl").addEventListener("click",()=>{const b=new Blob([JSON.stringify(fullBackup())],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);
+  a.download="golf-sicherung-simon-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);$("msg").textContent="Sicherung erstellt"});
+$("ul").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>applyBackup(r.result);r.readAsText(f);e.target.value=""});
+
+/* ---------- Start ---------- */
+try{const loc=JSON.parse(localStorage.getItem(LKEY));if(loc){S=loc.S||null;ROUNDS=loc.ROUNDS||[];CUSTOM=loc.CUSTOM||{}}}catch(e){}
+if(!S){S=JSON.parse(JSON.stringify(SEED));cacheLocal()}
+fillCourseSelect();buildHoleGrid();render();
+
+</script>
+
+</body>
+</html>
