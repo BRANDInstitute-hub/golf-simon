@@ -803,7 +803,7 @@ function gymSummary(){const from=addDays(isoToday(),-27),G=TRAIN.filter(x=>x.dat
   const L=lastSess("G2",x=>x.load);const ld=L?" · G2 zuletzt "+LOADX.filter(([e])=>L.load[e]!=null).map(([e,l])=>l.split(" ")[0]+" "+String(L.load[e]).replace(".",",")+" kg").join(", "):"";
   const rpe=rp.length?`Gym letzte 4 Wochen: Ø Anstrengung ${String(r1(rp.reduce((a,b)=>a+b,0)/rp.length)).replace(".",",")}${rp.filter(x=>x>=9).length>=2?' <b style="color:var(--warn)">(mehrmals ≥ 9, Erholung prüfen)</b>':""}`:"";
   return [rpe,rep.length?`<b style="color:var(--warn)">Beschwerden wiederholt: ${esc(rep.join(", "))}. Bitte abklären.</b>`:"",(sp+ld).replace(/^ · /,"")].filter(Boolean).join(" · ")}
-const CLUBS=[["dr","Driver"],["h3","Holz 3"],["hy","Hybrid"],["e4","Eisen 4"],["e5","Eisen 5"],["e6","Eisen 6"],["e7","Eisen 7"],["e8","Eisen 8"],["e9","Eisen 9"],["pw","PW"],["gw","GW / 50°"],["sw","SW / 56°"],["lw","LW / 60°"]];
+const CLUBS=[["dr","Driver"],["h3","Holz 3"],["h5","Holz 5"],["hy","Hybrid"],["e4","Eisen 4"],["e5","Eisen 5"],["e6","Eisen 6"],["e7","Eisen 7"],["e8","Eisen 8"],["e9","Eisen 9"],["pw","PW"],["gw","GW / 50°"],["sw","SW / 56°"],["lw","LW / 60°"]];
 function lastGap(){const m=Object.keys(TESTS).filter(x=>TESTS[x]&&TESTS[x].gap).sort().pop();return m?{m,g:TESTS[m].gap}:null}
 function renderGap(){if(!$("gapTbl"))return;const L=lastGap(),cur=(TESTS[testMonth]||{}).gap||{},ref=L?L.g:{};
   $("gapHead").textContent=L?`Zuletzt gemessen: ${L.m.slice(5)}/${L.m.slice(2,4)}${L.m<addDays(isoToday(),-90).slice(0,7)?" · älter als 3 Monate, bitte neu messen":""}`:"Noch keine Messung. Je Schläger ca. 10 Bälle mit dem Rapsodo schlagen und Median-Carry sowie Streuung eintragen.";
@@ -949,6 +949,7 @@ try{const loc=JSON.parse(localStorage.getItem(LKEY));if(loc){S=loc.S||null;ROUND
 if(!S){S=JSON.parse(JSON.stringify(SEED));cacheLocal()}
 if(S&&S.rec&&S.rec.some(o=>/geschätzt/.test(o.l))){const R=SEED.rec.filter(o=>!S.rec.some(x=>x.d===o.d&&x.l===o.l&&!/geschätzt/.test(x.l)));S.rec=S.rec.filter(o=>!/geschätzt/.test(o.l)).map(o=>o.d==="17.10.26"&&/^Faldo/.test(o.l)?{...o,sd:-2}:o).concat(R.filter(o=>o.d!=="17.10.26"));cacheLocal()}
 if(S&&S.hist&&S.hist.length<10&&S.hist[0]&&S.hist[0].l==="Start"){S.hist=SEED.hist.concat(S.hist.slice(2));cacheLocal()}
+if(!(TESTS["2026-09"]&&TESTS["2026-09"].gap)){TESTS={...TESTS,"2026-09":{...(TESTS["2026-09"]||{}),smash:1.39,gap:{"dr":{"c":215,"s":25},"h3":{"c":194,"s":7},"h5":{"c":195,"s":10},"e4":{"c":160,"s":9},"e5":{"c":147},"e6":{"c":157,"s":9},"e7":{"c":143},"e8":{"c":137,"s":7},"e9":{"c":121,"s":13},"pw":{"c":109,"s":8},"gw":{"c":97},"sw":{"c":84,"s":12}}}};cacheLocal()}
 fillCourseSelect();buildHoleGrid();render();
 
 </script>
