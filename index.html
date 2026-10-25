@@ -123,7 +123,7 @@ html{scroll-behavior:smooth}#tStrip,#tAnalysis,#roundsList,#stTitle,#holeRes,#ga
 .tag.training{border-color:var(--c-eagle);color:var(--c-eagle)}
 .seg button{white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+#gapTbl input{width:4.4em}#gapTbl th{white-space:nowrap}</style>
 </head>
 <body>
 
@@ -271,8 +271,9 @@ html{scroll-behavior:smooth}#tStrip,#tAnalysis,#roundsList,#stTitle,#holeRes,#ga
     <h3 id="gapTitle">Schlägerlängen (Rapsodo, alle 3 Monate)</h3>
     <p class="note" id="gapHead"></p>
     <div class="tbl"><table id="gapTbl"></table></div>
+    <p class="note" id="gapTrend"></p>
     <div class="row"><button class="small" id="gapSave">Schlägerlängen speichern</button><span class="note" id="gapMsg"></span></div>
-    <p class="note">Gespeichert wird für den oben gewählten Monat. Graue Werte sind die letzte Messung. „Lücke“ = mehr als 15 m bis zum nächsten Schläger, „fast gleich“ = weniger als 6 m.</p>
+    <p class="note">Gespeichert wird für den oben gewählten Monat. Graue Werte sind die letzte Messung. „Lücke“ = mehr als 15 m bis zum nächsten Schläger, „fast gleich“ = weniger als 6 m. Geschwindigkeiten in mph eintragen, so wie Rapsodo sie anzeigt. Smash rechnet die App selbst (Ball ÷ Club); der Driver-Smash geht automatisch in den Leistungstest, wenn dort noch keiner steht.</p>
   </section>
 
   <section id="secRec">
@@ -378,7 +379,7 @@ const PRESETS={
   motzA9G:{club:MZ,name:"A 1–9",tee:"Gelb",holes:9,cr:36.3,s:139,par:MA,si:[9,8,6,1,7,4,5,3,2]}
 };
 const SEED={"rec":[{"d":"17.10.26","l":"Faldo Weiß · 73","sd":-2.0,"adj":-2,"esr":-2},{"d":"16.10.26","l":"After Work 9 L · 37","sd":6.7,"adj":-2},{"d":"19.09.26","l":"End of Summer · 87","sd":13.7,"adj":-2},{"d":"12.09.26","l":"Jugendcup 9 L · 37","sd":7.5,"adj":-2},{"d":"30.08.26","l":"Clubmeisterschaft · 88","sd":13.7,"adj":-2},{"d":"29.08.26","l":"Clubmeisterschaft · 81","sd":8.3,"adj":-2},{"d":"20.08.26","l":"GVBB Gatow · 88","sd":15,"adj":-2},{"d":"19.08.26","l":"GVBB Gatow · 84","sd":11.4,"adj":-2},{"d":"18.08.26","l":"GVBB Gatow · 81","sd":8.7,"adj":-2},{"d":"05.08.26","l":"Offener Mittwoch · 92","sd":17.3,"adj":-2},{"d":"21.06.26","l":"Monatspreis S · 82","sd":9.2,"adj":-2},{"d":"03.05.26","l":"Quali Nat. Vorausscheid · 84","sd":9.9,"adj":-2},{"d":"02.05.26","l":"Quali Nat. Vorausscheid · 96","sd":19.0,"adj":-2},{"d":"10.04.26","l":"GJGT GolfData24 Open · 94","sd":17.0,"adj":-2},{"d":"09.04.26","l":"GJGT GolfData24 Open · 84","sd":8.1,"adj":-2},{"d":"08.04.26","l":"GJGT GolfData24 Open · 86","sd":9.9,"adj":-2},{"d":"07.04.26","l":"GJGT GolfData24 Open · 90","sd":13.4,"adj":-2},{"d":"22.10.25","l":"German Junior Championship · 93","sd":16.1,"adj":-2},{"d":"21.10.25","l":"German Junior Championship · 99","sd":21.4,"adj":-2},{"d":"20.10.25","l":"German Junior Championship · 95","sd":17.8,"adj":-2}],"hist":[{"l":"22.05.21","h":54.0},{"l":"05.06.21","h":36.5},{"l":"04.09.21","h":36.5},{"l":"05.09.21","h":36.5},{"l":"12.11.23","h":36.5},{"l":"13.04.24","h":36.5},{"l":"03.08.24","h":36.5},{"l":"10.08.24","h":35.9},{"l":"31.08.24","h":32.3},{"l":"01.09.24","h":32.3},{"l":"07.09.24","h":32.2},{"l":"14.09.24","h":32.2},{"l":"20.10.24","h":32.2},{"l":"21.10.24","h":32.2},{"l":"22.10.24","h":32.2},{"l":"23.10.24","h":32.2},{"l":"05.04.25","h":32.2},{"l":"12.04.25","h":27.1},{"l":"23.04.25","h":26.3},{"l":"24.04.25","h":26.3},{"l":"25.04.25","h":26.3},{"l":"26.04.25","h":26.3},{"l":"29.04.25","h":24.4},{"l":"13.05.25","h":24.0},{"l":"17.05.25","h":24.5},{"l":"18.05.25","h":23.7},{"l":"20.05.25","h":22.8},{"l":"27.05.25","h":22.0},{"l":"03.06.25","h":21.9},{"l":"07.06.25","h":21.8},{"l":"14.06.25","h":21.1},{"l":"24.06.25","h":20.9},{"l":"05.07.25","h":20.9},{"l":"08.07.25","h":19.8},{"l":"27.07.25","h":19.5},{"l":"31.07.25","h":17.3},{"l":"01.08.25","h":17.3},{"l":"26.08.25","h":17.3},{"l":"27.08.25","h":17.3},{"l":"03.09.25","h":16.8},{"l":"06.09.25","h":15.9},{"l":"07.09.25","h":15.9},{"l":"13.09.25","h":15.7},{"l":"23.09.25","h":15.7},{"l":"30.09.25","h":15.4},{"l":"04.10.25","h":14.8},{"l":"12.10.25","h":14.8},{"l":"19.10.25","h":14.8},{"l":"20.10.25","h":14.8},{"l":"21.10.25","h":14.8},{"l":"22.10.25","h":14.8},{"l":"07.04.26","h":14.7},{"l":"08.04.26","h":14.7},{"l":"09.04.26","h":14.7},{"l":"10.04.26","h":14.7},{"l":"02.05.26","h":12.6},{"l":"03.05.26","h":12.6},{"l":"21.06.26","h":12.5},{"l":"05.08.26","h":11.5},{"l":"18.08.26","h":11.5},{"l":"19.08.26","h":11.5},{"l":"20.08.26","h":11.5},{"l":"23.08.26","h":10.4},{"l":"29.08.26","h":10.4},{"l":"30.08.26","h":10.4},{"l":"12.09.26","h":9.8},{"l":"19.09.26","h":9.1},{"l":"16.10.26","h":9.1},{"l":"17.10.26","h":8.5},{"l":"18.10.26","h":5.1}],"low":5.1,"undo":[]};
-const CFG={"sgRef":0,"bad":1,"kpi":{"pen":1,"p3":1,"fw":55,"gir":55,"ud":50,"dbl":1,"rep":1,"rt":90,"pl":90},"id": "simon", "who": "Simon Steiner · Berliner GC Stolper Heide", "fav": ["westW", "westS", "ost18", "faldoW"], "scen": ["westW", "westS", "ost18", "faldoW"], "goal": 1, "goalH": 1, "goalDate": "2027-06-30", "goalStart": 5.1, "typical": 12.0, "typicalText": "Spielt Simon auf seinem bisherigen Niveau (Ø SD ≈ 12, rund 85 vom Weiß West),", "recNote": "Ausgangswerte: alle 20 Runden laut DGV-Scoring-Record vom 18.10.2026 (golf.de), inkl. ESR −2 aus der Faldo-Runde.", "def": "westW"};
+const CFG={"spu":"mph","sgRef":0,"bad":1,"kpi":{"pen":1,"p3":1,"fw":55,"gir":55,"ud":50,"dbl":1,"rep":1,"rt":90,"pl":90},"id": "simon", "who": "Simon Steiner · Berliner GC Stolper Heide", "fav": ["westW", "westS", "ost18", "faldoW"], "scen": ["westW", "westS", "ost18", "faldoW"], "goal": 1, "goalH": 1, "goalDate": "2027-06-30", "goalStart": 5.1, "typical": 12.0, "typicalText": "Spielt Simon auf seinem bisherigen Niveau (Ø SD ≈ 12, rund 85 vom Weiß West),", "recNote": "Ausgangswerte: alle 20 Runden laut DGV-Scoring-Record vom 18.10.2026 (golf.de), inkl. ESR −2 aus der Faldo-Runde.", "def": "westW"};
 const $=id=>document.getElementById(id);
 const r1=x=>Math.round(x*10)/10;
 const fmt=x=>(x<0?"−":"")+Math.abs(x).toFixed(1).replace(".",",");
@@ -805,14 +806,23 @@ function gymSummary(){const from=addDays(isoToday(),-27),G=TRAIN.filter(x=>x.dat
   return [rpe,rep.length?`<b style="color:var(--warn)">Beschwerden wiederholt: ${esc(rep.join(", "))}. Bitte abklären.</b>`:"",(sp+ld).replace(/^ · /,"")].filter(Boolean).join(" · ")}
 const CLUBS=[["dr","Driver"],["h3","Holz 3"],["h5","Holz 5"],["hy","Hybrid"],["e4","Eisen 4"],["e5","Eisen 5"],["e6","Eisen 6"],["e7","Eisen 7"],["e8","Eisen 8"],["e9","Eisen 9"],["pw","PW"],["gw","GW / 50°"],["sw","SW / 56°"],["lw","LW / 60°"]];
 function lastGap(){const m=Object.keys(TESTS).filter(x=>TESTS[x]&&TESTS[x].gap).sort().pop();return m?{m,g:TESTS[m].gap}:null}
+const SPU=(typeof CFG!=="undefined"&&CFG.spu)||"km/h";
 function renderGap(){if(!$("gapTbl"))return;const L=lastGap(),cur=(TESTS[testMonth]||{}).gap||{},ref=L?L.g:{};
-  $("gapHead").textContent=L?`Zuletzt gemessen: ${L.m.slice(5)}/${L.m.slice(2,4)}${L.m<addDays(isoToday(),-90).slice(0,7)?" · älter als 3 Monate, bitte neu messen":""}`:"Noch keine Messung. Je Schläger ca. 10 Bälle mit dem Rapsodo schlagen und Median-Carry sowie Streuung eintragen.";
+  $("gapHead").textContent=L?`Zuletzt gemessen: ${L.m.slice(5)}/${L.m.slice(2,4)}${L.m<addDays(isoToday(),-90).slice(0,7)?" · älter als 3 Monate, bitte neu messen":""}`:"Noch keine Messung. Je Schläger 8–10 Bälle mit dem Rapsodo schlagen und die Mediane eintragen.";
   const vals=CLUBS.map(([k])=>(cur[k]||ref[k]||{}).c);
-  $("gapTbl").innerHTML=`<tr><th>Schläger</th><th>Carry m (Median)</th><th>Streuung ± m</th><th>Abstand zum nächsten</th></tr>`+CLUBS.map(([k,l],i)=>{const c=cur[k]||{},r=ref[k]||{};let nx=null;for(let j=i+1;j<CLUBS.length;j++)if(vals[j]!=null){nx=vals[j];break}
+  const sm=o=>o&&o.cs&&o.bs?Math.round(o.bs/o.cs*100)/100:null, f2=v=>v==null?"–":String(v.toFixed(2)).replace(".",",");
+  const inp=(k,f,l,c,r)=>`<input id="gp_${f}_${k}" inputmode="decimal" value="${c[f]!=null?String(c[f]).replace(".",","):""}" placeholder="${r[f]!=null?String(r[f]).replace(".",","):""}" aria-label="${l} ${f}">`;
+  $("gapTbl").innerHTML=`<tr><th>Schläger</th><th>Carry m<br>(Median)</th><th>Streuung<br>± m</th><th>Club Speed<br>${SPU}</th><th>Ball Speed<br>${SPU}</th><th>Smash</th><th>Abflug-<br>winkel °</th><th>Abstand zum<br>nächsten</th></tr>`+CLUBS.map(([k,l],i)=>{const c=cur[k]||{},r=ref[k]||{};let nx=null;for(let j=i+1;j<CLUBS.length;j++)if(vals[j]!=null){nx=vals[j];break}
     const d=vals[i]!=null&&nx!=null?Math.round(vals[i]-nx):null;const flag=d==null?"":d>15?' <span class="pill esr">Lücke</span>':d<6?' <span class="pill esr">fast gleich</span>':"";
-    return `<tr><td>${l}</td><td><input id="gp_c_${k}" inputmode="decimal" value="${c.c!=null?c.c:""}" placeholder="${r.c!=null?r.c:""}" aria-label="${l} Carry"></td><td><input id="gp_s_${k}" inputmode="decimal" value="${c.s!=null?c.s:""}" placeholder="${r.s!=null?r.s:""}" aria-label="${l} Streuung"></td><td>${d!=null?d+" m":"–"}${flag}</td></tr>`}).join("")}
-function saveGap(){const g={};CLUBS.forEach(([k])=>{const c=pnum($("gp_c_"+k).value),sd=pnum($("gp_s_"+k).value);if(c!=null||sd!=null)g[k]={...(c!=null?{c}:{}),...(sd!=null?{s:sd}:{})}});
-  TESTS={...TESTS,[testMonth]:{...(TESTS[testMonth]||{}),gap:g}};writeTest(testMonth);$("gapMsg").textContent="Schlägerlängen gespeichert";renderTrain()}
+    const s=sm(c.cs!=null||c.bs!=null?c:r);
+    return `<tr><td>${l}</td><td>${inp(k,"c",l,c,r)}</td><td>${inp(k,"s",l,c,r)}</td><td>${inp(k,"cs",l,c,r)}</td><td>${inp(k,"bs",l,c,r)}</td><td id="gp_sm_${k}">${f2(s)}</td><td>${inp(k,"la",l,c,r)}</td><td>${d!=null?d+" m":"–"}${flag}</td></tr>`}).join("");
+  CLUBS.forEach(([k])=>["cs","bs"].forEach(f=>{const e=$("gp_"+f+"_"+k);if(e)e.addEventListener("input",()=>{const cs=pnum($("gp_cs_"+k).value),bs=pnum($("gp_bs_"+k).value);$("gp_sm_"+k).textContent=cs&&bs?f2(Math.round(bs/cs*100)/100):"–"})}));
+  const ms=Object.keys(TESTS).filter(m=>TESTS[m]&&TESTS[m].gap&&TESTS[m].gap.dr&&(TESTS[m].gap.dr.cs||TESTS[m].gap.dr.c)).sort();
+  if($("gapTrend"))$("gapTrend").innerHTML=ms.length?"<b>Driver-Verlauf:</b> "+ms.map(m=>{const o=TESTS[m].gap.dr;return `${m.slice(5)}/${m.slice(2,4)}: ${o.c!=null?o.c+" m":""}${o.cs?` · Club ${o.cs} ${SPU}`:""}${o.bs?` · Ball ${o.bs} ${SPU}`:""}${sm(o)?` · Smash ${f2(sm(o))}`:""}`}).join(" → "):""}
+function saveGap(){const g={};CLUBS.forEach(([k])=>{const o={};["c","s","cs","bs","la"].forEach(f=>{const v=pnum($("gp_"+f+"_"+k).value);if(v!=null)o[f]=v});if(Object.keys(o).length)g[k]=o});
+  const t={...(TESTS[testMonth]||{}),gap:g};let msg="Schlägerlängen gespeichert";
+  if(g.dr&&g.dr.cs&&g.dr.bs&&t.smash==null){t.smash=Math.round(g.dr.bs/g.dr.cs*100)/100;msg+=" · Driver-Smash in den Leistungstest übernommen"}
+  TESTS={...TESTS,[testMonth]:t};writeTest(testMonth);$("gapMsg").textContent=msg;renderTrain()}
 const CURVE_START="2026-10-19";
 const isGym=k=>PLAN.units[k].b.every(b=>b.a==="kraft");
 const ord=ks=>ks.slice().sort((a,b)=>isGym(b)-isGym(a));
@@ -950,6 +960,8 @@ if(!S){S=JSON.parse(JSON.stringify(SEED));cacheLocal()}
 if(S&&S.rec&&S.rec.some(o=>/geschätzt/.test(o.l))){const R=SEED.rec.filter(o=>!S.rec.some(x=>x.d===o.d&&x.l===o.l&&!/geschätzt/.test(x.l)));S.rec=S.rec.filter(o=>!/geschätzt/.test(o.l)).map(o=>o.d==="17.10.26"&&/^Faldo/.test(o.l)?{...o,sd:-2}:o).concat(R.filter(o=>o.d!=="17.10.26"));cacheLocal()}
 if(S&&S.hist&&S.hist.length<10&&S.hist[0]&&S.hist[0].l==="Start"){S.hist=SEED.hist.concat(S.hist.slice(2));cacheLocal()}
 if(!(TESTS["2026-09"]&&TESTS["2026-09"].gap)){TESTS={...TESTS,"2026-09":{...(TESTS["2026-09"]||{}),smash:1.39,gap:{"dr":{"c":215,"s":25},"h3":{"c":194,"s":7},"h5":{"c":195,"s":10},"e4":{"c":160,"s":9},"e5":{"c":147},"e6":{"c":157,"s":9},"e7":{"c":143},"e8":{"c":137,"s":7},"e9":{"c":121,"s":13},"pw":{"c":109,"s":8},"gw":{"c":97},"sw":{"c":84,"s":12}}}};cacheLocal()}
+if(TESTS["2026-09"]&&TESTS["2026-09"].gap&&TESTS["2026-09"].gap.dr&&TESTS["2026-09"].gap.dr.cs==null){const g=TESTS["2026-09"].gap,U={dr:{cs:103,bs:146,la:15},e5:{cs:86,bs:119},e9:{cs:78,bs:96,la:26},pw:{cs:78,bs:87,la:33},sw:{la:37}};Object.keys(U).forEach(k=>{g[k]={...(g[k]||{}),...U[k]}});cacheLocal()}
+Object.keys(TESTS).forEach(m=>{const g=TESTS[m]&&TESTS[m].gap;if(g&&g.dr&&g.dr.cs>=130&&!TESTS[m].mph){Object.values(g).forEach(o=>{["cs","bs"].forEach(x=>{if(o[x]!=null)o[x]=Math.round(o[x]/1.609)})});TESTS[m].mph=1;cacheLocal()}});
 fillCourseSelect();buildHoleGrid();render();
 
 </script>
